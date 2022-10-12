@@ -1,2 +1,2 @@
-# vue3-video-monitor
-vue3 + typescript + videojs + flvjs
+# v3d-monitor
+vue3 + typescript + dplayer + flvjs + hls
