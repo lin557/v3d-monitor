@@ -1,5 +1,5 @@
 <template>
-  <div class="v3m-monitor">
+  <div class="v3m-monitor" :class="controlCls">
     <div class="v3m-view" :class="viewCls" ref="refView">
       <v3d-player
         v-for="(item, index) in self.videos"
@@ -85,7 +85,7 @@
   </div>
 </template>
 <script lang="ts" setup name="V3dMonitor">
-import { ref, reactive, computed, watch, defineEmits, onMounted, onBeforeUnmount, onBeforeUpdate, onUpdated } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onBeforeUpdate } from 'vue'
 import V3dPlayer from 'v3d-player'
 import 'v3d-player/dist/style.css'
 
@@ -94,8 +94,7 @@ const refView = ref()
 let refPlayers: Array<Player> = []
 
 interface ApplyParam {
-  order: number
-  viewIndex: number | undefined
+  viewIndex?: number | undefined
   unique: string
   title: string
 }
@@ -433,6 +432,10 @@ const doDbClick = (index: number) => {
   }
 }
 
+/**
+ * 视频缩放
+ * @param fill ture/false
+ */
 const filled = (fill: boolean) => {
   self.filled = fill
 }
@@ -580,9 +583,16 @@ const play = (opts: V3dMonitorOptions) => {
   let unique = getName(opts.src)
   // 判断是否正在播放中
   let player = getPlaying(unique)
-  if (player && player.status() > 1 && !props.duplicate) {
-    // 播放中 并不允许重复
-    return
+  // 播放中 并设置了不允许重复
+  if (player && !props.duplicate) {
+    // 播放中不可能是 0
+    if (player.status() <= 1) {
+      // 占用中 使用占用的窗口进行播放
+      opts.viewIndex = player.index()
+    } else {
+      // status > 1
+      return
+    }
   }
   if (
     opts.viewIndex !== undefined &&
@@ -681,16 +691,8 @@ const getName = (url: string | undefined) => {
   return ret
 }
 
-onBeforeUnmount(() => {
-
-})
-
 onBeforeUpdate(() => {
   refPlayers = []
-})
-
-onUpdated(() => {
-
 })
 
 onMounted(() => {
@@ -712,13 +714,24 @@ watch(self, (newValue, oldValue) => {
       self.videos[index].cls = calcCls(index)
     }
     self.viewMax = undefined
-    
   }
 })
 
 defineExpose({
+  apply,
+  clear,
   close,
+  filled,
+  getEarlyView,
+  getIdleView,
+  getName,
+  getPlayerById,
+  getPlaying,
+  getSelected,
+  getViewCount,
+  muted,
   play,
+  stop,
 })
 
 </script>
