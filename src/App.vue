@@ -1,6 +1,6 @@
 <template>
   <div class="demo">
-    <v3d-monitor ref="refMonitor" :lockControl="true" :duplicate="false" />
+    <v3d-monitor ref="refMonitor" :lock-control="true" :duplicate="false" />
 
     <div class="demo-control">
       <!-- <input type="text" class="demo-url" v-model="options.src"/> -->
@@ -11,10 +11,9 @@
       <button @click="play(3)">play(3)</button>
     </div>
   </div>
-  
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref } from 'vue'
 import V3dMonitor from './components/v3d-monitor.vue'
 
 const refMonitor = ref()
@@ -28,7 +27,7 @@ const play = (index: number) => {
     {
       title: 'prog_index.m3u8',
       // src: 'https://www.transcodegroup.cn/test/h264.flv'
-      src: '//d2zihajmogu5jn.cloudfront.net/bipbop-advanced/gear3/prog_index.m3u8',
+      src: '//d2zihajmogu5jn.cloudfront.net/bipbop-advanced/gear3/prog_index.m3u8'
       // viewIndex: 1,
     },
     {
@@ -47,7 +46,6 @@ const play = (index: number) => {
 
   refMonitor.value.play(opts[index])
 }
-
 </script>
 <style lang="scss">
 .demo {

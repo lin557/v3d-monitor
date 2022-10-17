@@ -1,17 +1,17 @@
 <template>
   <div class="v3m-monitor" :class="controlCls">
-    <div class="v3m-view" :class="viewCls" ref="refView">
+    <div ref="refView" class="v3m-view" :class="viewCls">
       <v3d-player
         v-for="(item, index) in self.videos"
         :key="item.id"
         :ref="setPlayerRef"
         :index="index"
-        :lockControl="item.lockControl"
+        :lock-control="item.lockControl"
         :class="item.cls"
         @click="doClick(index)"
         @dblclick="doDbClick(index)"
       ></v3d-player>
-    
+
       <!-- 边框 -->
       <div class="v3m-border v3m-h v3m-h1"></div>
       <div class="v3m-border v3m-h v3m-h2"></div>
@@ -88,25 +88,11 @@
 import { ref, reactive, computed, watch, onMounted, onBeforeUpdate } from 'vue'
 import V3dPlayer from 'v3d-player'
 import 'v3d-player/dist/style.css'
+import { V3dApplyParam, V3dMonitorOptions } from '../../d.ts'
 
-type Player = typeof V3dPlayer
 const refView = ref()
+type Player = typeof V3dPlayer
 let refPlayers: Array<Player> = []
-
-interface ApplyParam {
-  viewIndex?: number | undefined
-  unique: string
-  title: string
-}
-
-interface V3dMonitorOptions {
-  autoRate?: boolean | undefined
-  order?: number
-  src: string
-  title?: string | undefined
-  unique?: string | undefined
-  viewIndex?: number | undefined
-}
 
 const props = defineProps({
   closeAfterViewChange: {
@@ -151,7 +137,7 @@ const props = defineProps({
   /**
    * 常驻工具栏
    */
-    lockControl: {
+  lockControl: {
     type: Boolean,
     default: false
   },
@@ -281,7 +267,7 @@ const viewCls = computed(() => {
 /**
  * 申请一个播放窗口
  */
-const apply = (param: ApplyParam) => {
+const apply = (param: V3dApplyParam) => {
   let player = null
   if (param.viewIndex !== undefined) {
     // 优先占用指定窗口
@@ -392,7 +378,7 @@ const calcCls = (index: number) => {
  * 关闭所有视频
  */
 const clear = () => {
-  self.videos.forEach((value) => {
+  self.videos.forEach(value => {
     const player = getPlayerById(value.id)
     player.close()
   })
@@ -407,7 +393,7 @@ const createView = () => {
       self.videos.push({
         id: i,
         cls: calcCls(i),
-        lockControl: props.lockControl,
+        lockControl: props.lockControl
       })
     }
   }
@@ -547,7 +533,7 @@ const handleOptions = (opts: V3dMonitorOptions) => {
     src: opts.src,
     title: opts.title,
     unique: unique,
-    volume: 1.0,
+    volume: 1.0
   }
 }
 
@@ -556,7 +542,7 @@ const handleOptions = (opts: V3dMonitorOptions) => {
  */
 const isViewExist = (id: number) => {
   let ret = false
-  self.videos.forEach((value) => {
+  self.videos.forEach(value => {
     if (value.id === id) {
       ret = true
       return
@@ -566,7 +552,7 @@ const isViewExist = (id: number) => {
 }
 
 const muted = () => {
-  self.videos.forEach((value) => {
+  self.videos.forEach(value => {
     const player = getPlayerById(value.id)
     if (player) {
       player.muted()
@@ -630,6 +616,7 @@ const setFocus = (player: Player) => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const setPlayerRef = (el: any) => {
   if (el) {
     refPlayers.push(el)
@@ -686,7 +673,7 @@ const getName = (url: string | undefined) => {
           return sTmp
         }
       }
-    } 
+    }
   }
   return ret
 }
@@ -707,7 +694,7 @@ watch(props, (newValue, oldValue) => {
   }
 })
 
-watch(self, (newValue, oldValue) => {
+watch(self, newValue => {
   if (newValue.viewCount === 1) {
     if (self.viewMax) {
       const index = self.viewMax.index
@@ -731,9 +718,8 @@ defineExpose({
   getViewCount,
   muted,
   play,
-  stop,
+  stop
 })
-
 </script>
 <style lang="scss">
 $controlHeight: 56px;
@@ -1056,7 +1042,7 @@ $controlColor: #202020;
       .v3d-player {
         height: 25%;
         width: 25%;
-        
+
         .v3d-shade {
           .v3d-center {
             left: calc(50% - 25px);
