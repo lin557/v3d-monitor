@@ -1,6 +1,6 @@
 {
   "name": "v3d-monitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Vue3 Multi-window video player",
   "main": "dist/v3d-monitor.umd.js",
   "module": "dist/v3d-monitor.es.js",
