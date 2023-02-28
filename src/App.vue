@@ -36,11 +36,11 @@ const play = (index: number) => {
     },
     {
       title: '蒙H12388D CH1',
-      src: 'https://www.transcode.cn/mdvr/live/17000070605_2.flv'
+      src: 'https://xn.transcodegroup.cn:8588/mdvr/live/12388_1.flv'
     },
     {
       title: '蒙H12388D CH2',
-      src: 'https://xn.transcode.cn:8586/mdvr/live/15888_2.flv'
+      src: 'https://xn.transcodegroup.cn:8588/mdvr/live/12388_2.flv'
     }
   ]
 
