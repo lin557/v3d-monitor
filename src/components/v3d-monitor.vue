@@ -97,7 +97,7 @@ let refPlayers: Array<Player> = []
 const props = defineProps({
   closeAfterViewChange: {
     type: Boolean,
-    default: true
+    default: false
   },
   control: {
     type: Object,
@@ -638,7 +638,7 @@ const splitView = (uCount: number) => {
     for (let i = self.viewCount; i < self.videos.length; i++) {
       const player = getPlayerById(self.videos[i].id)
       if (player) {
-        //player.close()
+        player.close()
       }
     }
   }
