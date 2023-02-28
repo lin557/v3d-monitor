@@ -81,7 +81,7 @@ onMounted(() => {
 - `position` 控制栏位置, 默认 `'bottom'`, 可选 `'top'`
 - `button` 控制栏上的按钮
 
-```json
+```
 {
     enabled: true,
     position: 'bottom',
@@ -119,11 +119,11 @@ onMounted(() => {
 
   示例:
 
-  ```json
+  ```
   const param = {
-    viewIndex: 1,
-    unique: 'h264.flv',
-    title: 'test'
+      viewIndex: 1,
+      unique: 'h264.flv',
+      title: 'test'
   }
   ```
 
@@ -200,10 +200,10 @@ onMounted(() => {
 
   示例:
 
-  ```json
+  ```
   const opt = {
       title: 'prog_index.m3u8',
-      src: '//d2zihajmogu5jn.cloudfront.net/bipbop-advanced/gear3/prog_index.m3u8'
+      src: '//d2ziha.cloud.net/bipbop-advanced/gear3/prog_index.m3u8'
   }
   ```
 
