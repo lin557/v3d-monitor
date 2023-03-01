@@ -48,16 +48,18 @@ const play = () => {
 
 // 如果需要 这里只是示例，你可以在任何地方调用
 onMounted(() => {
-  play()
+  nextTick(() => {
+    play()
+  })
 })
 </script>
 
 <style>
 .demo {
-  margin-top: 50px;
+  margin-top: 20px;
   box-sizing: border-box;
   padding: 20px;
-  width: 100%;
+  width: 1024px;
   height: 800px;
   font-size: 14px;
 }
