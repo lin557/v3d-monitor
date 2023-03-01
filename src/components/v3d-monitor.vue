@@ -990,7 +990,7 @@ $controlColor: #202020;
 
     &.v3m-6s {
       .v3d-player {
-        height: 33.33%;
+        height: 33.3341%;
         width: 33.33%;
       }
 
@@ -1108,7 +1108,7 @@ $controlColor: #202020;
 
     &.v3m-9s {
       .v3d-player {
-        height: 33.33%;
+        height: 33.3341%;
         width: 33.33%;
 
         .v3d-shade {
