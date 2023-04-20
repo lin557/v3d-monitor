@@ -5,29 +5,38 @@
         v-for="(item, index) in self.videos"
         :key="item.id"
         :ref="setPlayerRef"
+        :border="item.border"
         :index="index"
         :lock-control="item.lockControl"
         :class="item.cls"
         @click="doClick(index)"
         @dblclick="doDbClick(index)"
-      ></v3d-player>
-
-      <!-- 边框 -->
-      <div class="v3m-border v3m-h v3m-h1"></div>
-      <div class="v3m-border v3m-h v3m-h2"></div>
-      <div class="v3m-border v3m-h v3m-h3"></div>
-      <div class="v3m-border v3m-h v3m-h4"></div>
-      <div class="v3m-border v3m-h v3m-h5"></div>
-      <div class="v3m-border v3m-h v3m-h6"></div>
-      <div class="v3m-border v3m-h v3m-h7"></div>
-
-      <div class="v3m-border v3m-v v3m-v1"></div>
-      <div class="v3m-border v3m-v v3m-v2"></div>
-      <div class="v3m-border v3m-v v3m-v3"></div>
-      <div class="v3m-border v3m-v v3m-v4"></div>
-      <div class="v3m-border v3m-v v3m-v5"></div>
-      <div class="v3m-border v3m-v v3m-v6"></div>
-      <div class="v3m-border v3m-v v3m-v7"></div>
+      >
+        <template v-slot:ready>
+          <template v-if="slots.ready">
+            <slot name="ready"></slot>
+          </template>
+          <template v-else>
+            <!--themes-->
+            <template v-if="isThemeDefault">
+              <v3d-default-ready />
+            </template>
+          </template>
+        </template>
+        <template v-slot:loading>
+          <template v-if="slots.loading">
+            <slot name="loading"></slot>
+          </template>
+          <template v-else>
+            <!--themes-->
+            <template v-if="isThemeDefault">
+              <v3d-default-loading>
+                {{ item.loadText }}
+              </v3d-default-loading>
+            </template>
+          </template>
+        </template>
+      </v3d-player>
     </div>
     <div class="v3m-control">
       <ul>
@@ -85,41 +94,63 @@
   </div>
 </template>
 <script lang="ts" setup name="V3dMonitor">
-import { ref, reactive, computed, watch, onMounted, onBeforeUpdate } from 'vue'
+import {
+  ref,
+  reactive,
+  computed,
+  watch,
+  useSlots,
+  onMounted,
+  onBeforeUpdate,
+  onBeforeMount
+} from 'vue'
 import V3dPlayer from 'v3d-player'
 import 'v3d-player/dist/style.css'
-import { V3dApplyParam, V3dMonitorOptions } from '../../d.ts'
-
+import { V3dApplyParam, V3dMonitorOptions, V3dControlBar } from '../../d.ts'
+import V3dDefaultReady from './themes/v3d-default-ready.vue'
+import v3dDefaultLoading from './themes/v3d-default-loading.vue'
+// 插槽
+const slots = useSlots()
 const refView = ref()
 type Player = typeof V3dPlayer
 let refPlayers: Array<Player> = []
+
+type MergeObject = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key in string | number]: any
+}
+
+// 只是写法这样看着顺眼
+type Target<A, B> = A & Omit<Partial<B>, keyof A>
+
+type Merge<A, B> = A & B
+
+function merge<A extends MergeObject, B extends MergeObject>(
+  target: A,
+  source: B
+): Merge<A, B> {
+  for (const key in source) {
+    if (typeof target[key] === 'undefined') {
+      ;(target[key] as Target<A, B>) = source[key]
+    }
+  }
+  return target as Merge<A, B>
+}
+
+const defaultControlBar = {
+  enabled: true,
+  position: 'bottom',
+  button: ['1', '4', '6', '8', '9', '10', '16', 'fill', 'mute', 'stop', 'clear']
+}
 
 const props = defineProps({
   closeAfterViewChange: {
     type: Boolean,
     default: false
   },
-  control: {
-    type: Object,
-    default() {
-      return {
-        enabled: true,
-        position: 'bottom',
-        button: [
-          '1',
-          '4',
-          '6',
-          '8',
-          '9',
-          '10',
-          '16',
-          'fill',
-          'mute',
-          'stop',
-          'clear'
-        ]
-      }
-    }
+  controlBar: {
+    type: [Object, Boolean],
+    default: true
   },
   count: {
     type: Number,
@@ -134,6 +165,11 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  // 关闭时间 秒
+  closeTime: {
+    type: Number,
+    default: 0
+  },
   /**
    * 常驻工具栏
    */
@@ -145,6 +181,10 @@ const props = defineProps({
   loopCreate: {
     type: Boolean,
     default: true
+  },
+  theme: {
+    type: String,
+    default: ''
   }
 })
 
@@ -157,6 +197,8 @@ interface VideoParam {
   id: number
   cls: string
   lockControl: boolean
+  border: boolean
+  loadText?: string
 }
 
 interface Data {
@@ -167,6 +209,7 @@ interface Data {
   selected: SelectedParam
   filled: boolean
   createOrder: number
+  controlBar: V3dControlBar
 }
 
 const _data: Data = {
@@ -180,7 +223,8 @@ const _data: Data = {
     player: undefined
   },
   filled: true,
-  createOrder: 0
+  createOrder: 0,
+  controlBar: defaultControlBar
 }
 
 let self = reactive(_data)
@@ -242,8 +286,8 @@ const btnViewClear = computed(() => {
 })
 
 const controlCls = computed(() => {
-  if (props.control.enabled) {
-    if (props.control.position === 'top') {
+  if (self.controlBar.enabled) {
+    if (self.controlBar.position === 'top') {
       return 'v3m-control-top'
     } else {
       return ''
@@ -251,6 +295,13 @@ const controlCls = computed(() => {
   } else {
     return 'v3m-control-hide'
   }
+})
+
+const isThemeDefault = computed(() => {
+  const theme = props.theme
+  return (
+    theme === null || theme === undefined || theme === '' || theme === 'default'
+  )
 })
 
 const viewCls = computed(() => {
@@ -269,14 +320,19 @@ const viewCls = computed(() => {
  */
 const apply = (param: V3dApplyParam) => {
   let player = null
+  let loadText = 'L O A D I N G'
+  if (param.loadText) {
+    loadText = param.loadText
+  }
   if (param.viewIndex !== undefined) {
     // 优先占用指定窗口
     player = getPlayerById(param.viewIndex)
     if (player) {
       // 存在时关闭旧的
       player.close()
+      self.videos[player.index()].loadText = loadText
       player.occupy(newOrder(), param.unique, param.title)
-      setFocus(player)
+      setSelected(player)
       return player.index()
     }
   }
@@ -288,17 +344,19 @@ const apply = (param: V3dApplyParam) => {
     player = getPlaying(param.unique)
     if (player) {
       // 正在播放中 设置焦点
-      setFocus(player)
+      setSelected(player)
       return -1
     } else {
       // 没有在播放 获取一个空闲窗口
       player = getIdleView()
     }
   }
+
   if (player) {
     // 有可用窗口 占用
+    self.videos[player.index()].loadText = loadText
     player.occupy(newOrder(), param.unique, param.title)
-    setFocus(player)
+    setSelected(player)
     return player.index()
   }
   // 窗口都被用了 关掉最先创建的窗口
@@ -308,8 +366,9 @@ const apply = (param: V3dApplyParam) => {
     if (player) {
       // 存在时关闭旧的
       player.close()
+      self.videos[player.index()].loadText = loadText
       player.occupy(newOrder(), param.unique, param.title)
-      setFocus(player)
+      setSelected(player)
       return player.index()
     }
     return -1
@@ -319,7 +378,7 @@ const apply = (param: V3dApplyParam) => {
 }
 
 const calcBtnView = (value: string) => {
-  if (props.control.button.indexOf(value) === -1) {
+  if (self.controlBar.button.indexOf(value) === -1) {
     return false
   } else {
     return true
@@ -393,7 +452,9 @@ const createView = () => {
       self.videos.push({
         id: i,
         cls: calcCls(i),
-        lockControl: props.lockControl
+        lockControl: props.lockControl,
+        border: true,
+        loadText: 'L O A D I N G'
       })
     }
   }
@@ -401,7 +462,7 @@ const createView = () => {
 
 const doClick = (index: number) => {
   const player = getPlayerById(index)
-  setFocus(player)
+  setSelected(player)
 }
 
 const doDbClick = (index: number) => {
@@ -514,26 +575,37 @@ const handleOptions = (opts: V3dMonitorOptions) => {
     unique = opts.unique
   }
 
+  let loadText = 'L O A D I N G'
+  if (opts.loadText) {
+    loadText = opts.loadText
+  }
+
   return {
+    allowPause: opts.allowPause,
     autoplay: true,
     autoRate: {
       enabled: opts.autoRate,
       min: 3.0,
       max: 9.0
     },
+    closeTime: props.closeTime,
     connect: true,
+    contextmenu: opts.contextmenu,
     controls: false,
     // hasAudio: opts.hasAudio,
     hotkey: false,
     live: true,
+    loadText: loadText,
     muted: true,
     order: newOrder(),
     preventClickToggle: true,
     record: true,
+    screenshot: opts.screenshot,
     src: opts.src,
     title: opts.title,
     unique: unique,
-    volume: 1.0
+    volume: 1.0,
+    userData: opts.userData
   }
 }
 
@@ -593,6 +665,7 @@ const play = (opts: V3dMonitorOptions) => {
   }
   if (player) {
     const v3dOpts = handleOptions(opts)
+    self.videos[player.index()].loadText = v3dOpts.loadText
     player.play(v3dOpts)
   }
 }
@@ -601,7 +674,7 @@ const play = (opts: V3dMonitorOptions) => {
 //   $emit('error', player, errType, errDetails, e)
 // }
 
-const setFocus = (player: Player) => {
+const setSelected = (player: Player) => {
   const lastFocus = getPlayerById(self.selected.id)
   if (lastFocus) {
     if (lastFocus === player) {
@@ -644,17 +717,28 @@ const splitView = (uCount: number) => {
   }
 }
 
-/**
- * 关闭选中的视频窗口
- */
-const stop = () => {
-  const selectPlayer = getPlayerById(self.selected.id)
+const snapshot = (index: number) => {
+  const selectPlayer = getPlayerById(index)
+  if (selectPlayer) {
+    selectPlayer.snapshot()
+  }
+}
+
+const close = (index: number) => {
+  const selectPlayer = getPlayerById(index)
   if (selectPlayer) {
     selectPlayer.close()
     if (self.viewMax) {
       self.viewMax = undefined
     }
   }
+}
+
+/**
+ * 关闭选中的视频窗口
+ */
+const stop = () => {
+  close(self.selected.id)
 }
 
 const togglefill = () => {
@@ -678,8 +762,23 @@ const getName = (url: string | undefined) => {
   return ret
 }
 
+const syncControlBar = () => {
+  if ('[object Boolean]' === Object.prototype.toString.call(props.controlBar)) {
+    self.controlBar = defaultControlBar
+    self.controlBar.enabled = props.controlBar as boolean
+  }
+  if ('[object Object]' === Object.prototype.toString.call(props.controlBar)) {
+    const value = props.controlBar as V3dControlBar
+    self.controlBar = merge(value, defaultControlBar)
+  }
+}
+
 onBeforeUpdate(() => {
   refPlayers = []
+})
+
+onBeforeMount(() => {
+  syncControlBar()
 })
 
 onMounted(() => {
@@ -691,6 +790,10 @@ watch(props, (newValue, oldValue) => {
   if (newValue.count !== oldValue.count) {
     self.viewCount = fixViewCount(newValue.count)
     createView()
+  }
+  if (newValue.controlBar !== oldValue.controlBar) {
+    console.log(newValue.controlBar)
+    syncControlBar()
   }
 })
 
@@ -718,6 +821,8 @@ defineExpose({
   getViewCount,
   muted,
   play,
+  setSelected,
+  snapshot,
   stop
 })
 </script>
@@ -735,7 +840,6 @@ $controlColor: #202020;
     width: 100%;
     height: $controlHeight;
     background: $controlColor;
-    border-top: 1px solid $borderColor;
     box-sizing: border-box;
     overflow: hidden;
 
@@ -843,7 +947,7 @@ $controlColor: #202020;
     }
     .v3m-control {
       border-top: none;
-      border-bottom: 1px solid $borderColor;
+      // border-bottom: 1px solid $borderColor;
       position: absolute;
       top: 0;
     }
@@ -867,7 +971,10 @@ $controlColor: #202020;
     .v3d-player {
       float: left;
       font-size: 12px;
-      background: black;
+    }
+
+    .v3d-border {
+      border: 1px solid #333;
     }
 
     &.v3m-fill {
@@ -880,34 +987,15 @@ $controlColor: #202020;
       }
     }
 
-    .v3m-border {
-      position: absolute;
-      background-color: $borderColor;
-      z-index: 5;
-      pointer-events: none;
-    }
-
-    .v3m-h {
-      height: 1px;
-      width: 100%;
-    }
-
-    .v3m-v {
-      width: 1px;
-      height: 100%;
-    }
-
     &.v3m-max {
       .v3d-player {
         height: 100% !important;
         width: 100% !important;
-
-        .v3d-focus-show {
-          display: none;
-        }
+      }
+      .v3d-focus {
+        border: 1px solid #333 !important;
       }
 
-      .v3m-border,
       .v3m-m1,
       .v3m-m4,
       .v3m-m6,
@@ -930,13 +1018,12 @@ $controlColor: #202020;
       .v3d-player {
         height: 100%;
         width: 100%;
-
-        .v3d-focus-show {
-          display: none;
-        }
       }
 
-      .v3m-border,
+      .v3d-focus {
+        border: 1px solid #333 !important;
+      }
+
       .v3m-m4,
       .v3m-m6,
       .v3m-m8,
@@ -999,16 +1086,6 @@ $controlColor: #202020;
         width: 66.66%;
       }
 
-      .v3m-h3,
-      .v3m-h4,
-      .v3m-h5,
-      .v3m-h6,
-      .v3m-h7,
-      .v3m-v3,
-      .v3m-v4,
-      .v3m-v5,
-      .v3m-v6,
-      .v3m-v7,
       .v3m-m8,
       .v3m-m9,
       .v3m-m10,
@@ -1018,24 +1095,6 @@ $controlColor: #202020;
       .v3m-m64 {
         display: none;
       }
-
-      .v3m-h1 {
-        top: 33.33333%;
-        left: 66.66666%;
-      }
-
-      .v3m-h2 {
-        top: 66.66666%;
-      }
-
-      .v3m-v1 {
-        left: 33.33333%;
-        top: 66.66666%;
-      }
-
-      .v3m-v2 {
-        left: 66.66666%;
-      }
     }
 
     &.v3m-8s {
@@ -1044,30 +1103,21 @@ $controlColor: #202020;
         width: 25%;
 
         .v3d-shade {
-          .v3d-center {
-            left: calc(50% - 25px);
-            top: calc(50% - 25px);
-            .svg-center {
-              width: 50px;
-              height: 50px;
-            }
+          .v3m-ready-icon {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            left: calc(50% - 40px);
+            top: calc(50% - 40px);
           }
         }
       }
 
       .v3m-s0 {
-        height: 75%;
+        height: 74.99%;
         width: 75%;
       }
 
-      .v3m-h4,
-      .v3m-h5,
-      .v3m-h6,
-      .v3m-h7,
-      .v3m-v4,
-      .v3m-v5,
-      .v3m-v6,
-      .v3m-v7,
       .v3m-m9,
       .v3m-m10,
       .v3m-m16,
@@ -1075,34 +1125,6 @@ $controlColor: #202020;
       .v3m-m36,
       .v3m-m64 {
         display: none;
-      }
-
-      .v3m-h1 {
-        top: 25%;
-        left: 75%;
-      }
-
-      .v3m-h2 {
-        top: 50%;
-        left: 75%;
-      }
-
-      .v3m-h3 {
-        top: 75%;
-      }
-
-      .v3m-v1 {
-        left: 25%;
-        top: 75%;
-      }
-
-      .v3m-v2 {
-        left: 50%;
-        top: 75%;
-      }
-
-      .v3m-v3 {
-        left: 75%;
       }
     }
 
@@ -1112,49 +1134,22 @@ $controlColor: #202020;
         width: 33.33%;
 
         .v3d-shade {
-          .v3d-center {
-            left: calc(50% - 25px);
-            top: calc(50% - 25px);
-            .svg-center {
-              width: 50px;
-              height: 50px;
-            }
+          .v3m-ready-icon {
+            position: absolute;
+            width: 86px;
+            height: 86px;
+            left: calc(50% - 43px);
+            top: calc(50% - 43px);
           }
         }
       }
 
-      .v3m-h3,
-      .v3m-h4,
-      .v3m-h5,
-      .v3m-h6,
-      .v3m-h7,
-      .v3m-v3,
-      .v3m-v4,
-      .v3m-v5,
-      .v3m-v6,
-      .v3m-v7,
       .v3m-m10,
       .v3m-m16,
       .v3m-m25,
       .v3m-m36,
       .v3m-m64 {
         display: none;
-      }
-
-      .v3m-h1 {
-        top: 33.33333%;
-      }
-
-      .v3m-h2 {
-        top: 66.66666%;
-      }
-
-      .v3m-v1 {
-        left: 33.33333%;
-      }
-
-      .v3m-v2 {
-        left: 66.66666%;
       }
     }
 
@@ -1164,13 +1159,12 @@ $controlColor: #202020;
         width: 25%;
 
         .v3d-shade {
-          .v3d-center {
-            left: calc(50% - 25px);
-            top: calc(50% - 25px);
-            .svg-center {
-              width: 50px;
-              height: 50px;
-            }
+          .v3m-ready-icon {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            left: calc(50% - 40px);
+            top: calc(50% - 40px);
           }
         }
       }
@@ -1181,42 +1175,11 @@ $controlColor: #202020;
         width: 50%;
       }
 
-      .v3m-h3,
-      .v3m-h4,
-      .v3m-h5,
-      .v3m-h6,
-      .v3m-h7,
-      .v3m-v4,
-      .v3m-v5,
-      .v3m-v6,
-      .v3m-v7,
       .v3m-m16,
       .v3m-m25,
       .v3m-m36,
       .v3m-m64 {
         display: none;
-      }
-
-      .v3m-h1 {
-        top: 50%;
-      }
-
-      .v3m-h2 {
-        top: 75%;
-      }
-
-      .v3m-v1 {
-        left: 25%;
-        top: 50%;
-      }
-
-      .v3m-v2 {
-        left: 50%;
-      }
-
-      .v3m-v3 {
-        left: 75%;
-        top: 50%;
       }
     }
 
@@ -1226,53 +1189,20 @@ $controlColor: #202020;
         width: 25%;
 
         .v3d-shade {
-          .v3d-center {
-            left: calc(50% - 25px);
-            top: calc(50% - 25px);
-            .svg-center {
-              width: 50px;
-              height: 50px;
-            }
+          .v3m-ready-icon {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            left: calc(50% - 35px);
+            top: calc(50% - 35px);
           }
         }
       }
 
-      .v3m-h4,
-      .v3m-h5,
-      .v3m-h6,
-      .v3m-h7,
-      .v3m-v4,
-      .v3m-v5,
-      .v3m-v6,
-      .v3m-v7,
       .v3m-m25,
       .v3m-m36,
       .v3m-m64 {
         display: none;
-      }
-
-      .v3m-h1 {
-        top: 25%;
-      }
-
-      .v3m-h2 {
-        top: 50%;
-      }
-
-      .v3m-h3 {
-        top: 75%;
-      }
-
-      .v3m-v1 {
-        left: 25%;
-      }
-
-      .v3m-v2 {
-        left: 50%;
-      }
-
-      .v3m-v3 {
-        left: 75%;
       }
     }
 
@@ -1282,58 +1212,19 @@ $controlColor: #202020;
         width: 20%;
 
         .v3d-shade {
-          .v3d-center {
-            left: calc(50% - 24px);
-            top: calc(50% - 24px);
-            .svg-center {
-              width: 48px;
-              height: 48px;
-            }
+          .v3m-ready-icon {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            left: calc(50% - 30px);
+            top: calc(50% - 30px);
           }
         }
       }
 
-      .v3m-h5,
-      .v3m-h6,
-      .v3m-h7,
-      .v3m-v5,
-      .v3m-v6,
-      .v3m-v7,
       .v3m-m36,
       .v3m-m64 {
         display: none;
-      }
-
-      .v3m-h1 {
-        top: 20%;
-      }
-
-      .v3m-h2 {
-        top: 40%;
-      }
-
-      .v3m-h3 {
-        top: 60%;
-      }
-
-      .v3m-h4 {
-        top: 80%;
-      }
-
-      .v3m-v1 {
-        left: 20%;
-      }
-
-      .v3m-v2 {
-        left: 40%;
-      }
-
-      .v3m-v3 {
-        left: 60%;
-      }
-
-      .v3m-v4 {
-        left: 80%;
       }
     }
 
@@ -1343,63 +1234,18 @@ $controlColor: #202020;
         width: 16.66666%;
 
         .v3d-shade {
-          .v3d-center {
-            left: calc(50% - 16px);
-            top: calc(50% - 16px);
-            .svg-center {
-              width: 32px;
-              height: 32px;
-            }
+          .v3m-ready-icon {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            left: calc(50% - 25px);
+            top: calc(50% - 25px);
           }
         }
       }
 
-      .v3m-h6,
-      .v3m-h7,
-      .v3m-v6,
-      .v3m-v7,
       .v3m-m64 {
         display: none;
-      }
-
-      .v3m-h1 {
-        top: 16.66666%;
-      }
-
-      .v3m-h2 {
-        top: 33.33333%;
-      }
-
-      .v3m-h3 {
-        top: 49.99999%;
-      }
-
-      .v3m-h4 {
-        top: 66.66666%;
-      }
-
-      .v3m-h5 {
-        top: 83.33333%;
-      }
-
-      .v3m-v1 {
-        left: 16.66666%;
-      }
-
-      .v3m-v2 {
-        left: 33.33333%;
-      }
-
-      .v3m-v3 {
-        left: 49.99999%;
-      }
-
-      .v3m-v4 {
-        left: 66.66666%;
-      }
-
-      .v3m-v5 {
-        left: 83.33333%;
       }
     }
 
@@ -1409,13 +1255,12 @@ $controlColor: #202020;
         width: 12.5%;
 
         .v3d-shade {
-          .v3d-center {
-            left: calc(50% - 16px);
-            top: calc(50% - 16px);
-            .svg-center {
-              width: 32px;
-              height: 32px;
-            }
+          .v3m-ready-icon {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            left: calc(50% - 20px);
+            top: calc(50% - 20px);
           }
         }
 
@@ -1424,62 +1269,6 @@ $controlColor: #202020;
             display: none;
           }
         }
-      }
-
-      .v3m-h1 {
-        top: 12.5%;
-      }
-
-      .v3m-h2 {
-        top: 25%;
-      }
-
-      .v3m-h3 {
-        top: 37.5%;
-      }
-
-      .v3m-h4 {
-        top: 50%;
-      }
-
-      .v3m-h5 {
-        top: 62.5%;
-      }
-
-      .v3m-h6 {
-        top: 75%;
-      }
-
-      .v3m-h7 {
-        top: 87.5%;
-      }
-
-      .v3m-v1 {
-        left: 12.5%;
-      }
-
-      .v3m-v2 {
-        left: 25%;
-      }
-
-      .v3m-v3 {
-        left: 37.5%;
-      }
-
-      .v3m-v4 {
-        left: 50%;
-      }
-
-      .v3m-v5 {
-        left: 62.5%;
-      }
-
-      .v3m-v6 {
-        left: 75%;
-      }
-
-      .v3m-v7 {
-        left: 87.5%;
       }
     }
   }
