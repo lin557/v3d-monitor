@@ -7,7 +7,14 @@
       :duplicate="false"
       :control-bar="controlBar"
       :close-time="closeTime"
-    />
+    >
+      <!-- <template v-slot:ready>
+        <div>abc</div>
+      </template>
+      <template v-slot:loading>
+        <div>123456</div>
+      </template> -->
+    </v3d-monitor>
 
     <div class="demo-control">
       <!-- <input type="text" class="demo-url" v-model="options.src"/> -->
@@ -171,7 +178,12 @@ const apply = () => {
   refMonitor.value.apply({
     unique: 'h264.flv',
     title: 'aaa',
-    loadText: 'ABCDEFG'
+    load: {
+      //logo: '',
+      title: '蒙H12388D',
+      detail: 'CH1 高清',
+      loading: '视频加载中'
+    }
   })
 }
 
@@ -208,7 +220,12 @@ const play = (index: number) => {
     {
       title: 'oceans.mp4',
       src: 'https://vjs.zencdn.net/v/oceans.mp4',
-      screenshot: true
+      screenshot: true,
+      load: {
+        title: '蒙H12388D',
+        detail: 'CH1 高清',
+        loading: '视频加载中'
+      }
     },
     {
       allowPause: true,

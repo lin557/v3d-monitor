@@ -1,22 +1,12 @@
 <template>
   <div class="v3m-loading-line">
     <div class="v3m-content">
-      <div class="v3m-logo">
-        <div class="v3m-logo-img">
-          <img src="../../assets/logo-7.png" />
-        </div>
-        <div class="v3m-logo-text">
-          <div class="v3m-logo-text-top">
-            <slot name="title"></slot>
-          </div>
-          <div class="v3m-logo-text-bottom">
-            <slot name="detail"></slot>
-          </div>
-        </div>
+      <div class="loading-logo">
+        <img src="../../assets/logo-4.png" />
       </div>
       <div class="loading-line"></div>
       <div class="loading-text">
-        <slot name="loading"></slot>
+        <slot></slot>
       </div>
     </div>
   </div>
@@ -25,12 +15,10 @@
 .v3m-loading-line {
   height: 100%;
   width: 100%;
-  background-color: #404042;
+  background-color: #1a2f45;
   display: flex;
   align-items: center;
   flex-direction: column;
-  font-family: 'Microsoft Yahe', '微软雅黑', 'Courier New', Courier, monospace;
-  user-select: none;
 
   .v3m-content {
     width: 170px;
@@ -40,33 +28,9 @@
     justify-content: center;
     flex-direction: column;
 
-    .v3m-logo {
-      display: flex;
-      width: 100%;
-
-      .v3m-logo-img {
-        img {
-          width: 48px;
-          height: 48px;
-        }
-      }
-
-      .v3m-logo-text {
-        width: calc(100% - 48px);
-        padding: 0 10px;
-        box-sizing: border-box;
-        text-align: center;
-
-        .v3m-logo-text-top {
-          padding: 1px 0;
-          font-size: 18px;
-          color: #e0e0e0;
-        }
-
-        .v3m-logo-text-bottom {
-          color: #727272;
-          font-size: 12px;
-        }
+    .loading-logo {
+      img {
+        height: 64px;
       }
     }
 

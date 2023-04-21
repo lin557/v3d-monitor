@@ -1,6 +1,6 @@
 {
   "name": "v3d-monitor",
-  "version": "1.0.9",
+  "version": "1.0.19",
   "description": "Vue3 Multi-window video player",
   "main": "dist/v3d-monitor.umd.js",
   "module": "dist/v3d-monitor.es.js",
@@ -40,7 +40,7 @@
   "author": "lin557",
   "license": "MIT",
   "dependencies": {
-    "v3d-player": "^1.1.2",
+    "v3d-player": "^1.1.5",
     "vue": "^3.2.47"
   },
   "devDependencies": {

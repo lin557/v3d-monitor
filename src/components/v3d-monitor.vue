@@ -10,7 +10,7 @@
         :lock-control="item.lockControl"
         :class="item.cls"
         @click="doClick(index)"
-        @dblclick="doDbClick(index)"
+        @dblclick.stop.prevent="doDbClick(index)"
       >
         <template v-slot:ready>
           <template v-if="slots.ready">
@@ -31,7 +31,9 @@
             <!--themes-->
             <template v-if="isThemeDefault">
               <v3d-default-loading>
-                {{ item.loadText }}
+                <template v-slot:title> {{ item.title }} </template>
+                <template v-slot:detail> {{ item.detail }} </template>
+                <template v-slot:loading> {{ item.loading }} </template>
               </v3d-default-loading>
             </template>
           </template>
@@ -106,7 +108,12 @@ import {
 } from 'vue'
 import V3dPlayer from 'v3d-player'
 import 'v3d-player/dist/style.css'
-import { V3dApplyParam, V3dMonitorOptions, V3dControlBar } from '../../d.ts'
+import {
+  V3dApplyParam,
+  V3dMonitorOptions,
+  V3dControlBar,
+  V3dLoading
+} from '../../d.ts'
 import V3dDefaultReady from './themes/v3d-default-ready.vue'
 import v3dDefaultLoading from './themes/v3d-default-loading.vue'
 // 插槽
@@ -198,7 +205,9 @@ interface VideoParam {
   cls: string
   lockControl: boolean
   border: boolean
-  loadText?: string
+  title?: string
+  detail?: string
+  loading?: string
 }
 
 interface Data {
@@ -315,22 +324,30 @@ const viewCls = computed(() => {
   return cls
 })
 
+const updateLoad = (index: number, param: V3dLoading | undefined) => {
+  if (param) {
+    let loadText = 'L O A D I N G'
+    if (param.loading) {
+      loadText = param.loading
+    }
+    self.videos[index].loading = loadText
+    self.videos[index].detail = param.detail
+    self.videos[index].title = param.title
+  }
+}
+
 /**
  * 申请一个播放窗口
  */
 const apply = (param: V3dApplyParam) => {
   let player = null
-  let loadText = 'L O A D I N G'
-  if (param.loadText) {
-    loadText = param.loadText
-  }
   if (param.viewIndex !== undefined) {
     // 优先占用指定窗口
     player = getPlayerById(param.viewIndex)
     if (player) {
       // 存在时关闭旧的
       player.close()
-      self.videos[player.index()].loadText = loadText
+      updateLoad(player.index(), param.load)
       player.occupy(newOrder(), param.unique, param.title)
       setSelected(player)
       return player.index()
@@ -354,7 +371,7 @@ const apply = (param: V3dApplyParam) => {
 
   if (player) {
     // 有可用窗口 占用
-    self.videos[player.index()].loadText = loadText
+    updateLoad(player.index(), param.load)
     player.occupy(newOrder(), param.unique, param.title)
     setSelected(player)
     return player.index()
@@ -366,7 +383,7 @@ const apply = (param: V3dApplyParam) => {
     if (player) {
       // 存在时关闭旧的
       player.close()
-      self.videos[player.index()].loadText = loadText
+      updateLoad(player.index(), param.load)
       player.occupy(newOrder(), param.unique, param.title)
       setSelected(player)
       return player.index()
@@ -454,7 +471,9 @@ const createView = () => {
         cls: calcCls(i),
         lockControl: props.lockControl,
         border: true,
-        loadText: 'L O A D I N G'
+        title: 'DIGITAL VIDEO',
+        detail: '',
+        loading: 'L O A D I N G'
       })
     }
   }
@@ -574,12 +593,6 @@ const handleOptions = (opts: V3dMonitorOptions) => {
   if (opts.unique) {
     unique = opts.unique
   }
-
-  let loadText = 'L O A D I N G'
-  if (opts.loadText) {
-    loadText = opts.loadText
-  }
-
   return {
     allowPause: opts.allowPause,
     autoplay: true,
@@ -595,7 +608,7 @@ const handleOptions = (opts: V3dMonitorOptions) => {
     // hasAudio: opts.hasAudio,
     hotkey: false,
     live: true,
-    loadText: loadText,
+    load: opts.load,
     muted: true,
     order: newOrder(),
     preventClickToggle: true,
@@ -665,7 +678,7 @@ const play = (opts: V3dMonitorOptions) => {
   }
   if (player) {
     const v3dOpts = handleOptions(opts)
-    self.videos[player.index()].loadText = v3dOpts.loadText
+    updateLoad(player.index(), v3dOpts.load)
     player.play(v3dOpts)
   }
 }
@@ -971,6 +984,7 @@ $controlColor: #202020;
     .v3d-player {
       float: left;
       font-size: 12px;
+      user-select: none;
     }
 
     .v3d-border {
@@ -1105,10 +1119,10 @@ $controlColor: #202020;
         .v3d-shade {
           .v3m-ready-icon {
             position: absolute;
-            width: 80px;
-            height: 80px;
-            left: calc(50% - 40px);
-            top: calc(50% - 40px);
+            width: 64px;
+            height: 64px;
+            left: calc(50% - 32px);
+            top: calc(50% - 32px);
           }
         }
       }
@@ -1136,10 +1150,10 @@ $controlColor: #202020;
         .v3d-shade {
           .v3m-ready-icon {
             position: absolute;
-            width: 86px;
-            height: 86px;
-            left: calc(50% - 43px);
-            top: calc(50% - 43px);
+            width: 64px;
+            height: 64px;
+            left: calc(50% - 32px);
+            top: calc(50% - 32px);
           }
         }
       }
@@ -1161,10 +1175,10 @@ $controlColor: #202020;
         .v3d-shade {
           .v3m-ready-icon {
             position: absolute;
-            width: 80px;
-            height: 80px;
-            left: calc(50% - 40px);
-            top: calc(50% - 40px);
+            width: 64px;
+            height: 64px;
+            left: calc(50% - 32px);
+            top: calc(50% - 32px);
           }
         }
       }
@@ -1191,10 +1205,10 @@ $controlColor: #202020;
         .v3d-shade {
           .v3m-ready-icon {
             position: absolute;
-            width: 70px;
-            height: 70px;
-            left: calc(50% - 35px);
-            top: calc(50% - 35px);
+            width: 64px;
+            height: 64px;
+            left: calc(50% - 32px);
+            top: calc(50% - 32px);
           }
         }
       }
@@ -1214,10 +1228,10 @@ $controlColor: #202020;
         .v3d-shade {
           .v3m-ready-icon {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            left: calc(50% - 30px);
-            top: calc(50% - 30px);
+            width: 52px;
+            height: 52px;
+            left: calc(50% - 26px);
+            top: calc(50% - 26px);
           }
         }
       }
@@ -1236,10 +1250,10 @@ $controlColor: #202020;
         .v3d-shade {
           .v3m-ready-icon {
             position: absolute;
-            width: 50px;
-            height: 50px;
-            left: calc(50% - 25px);
-            top: calc(50% - 25px);
+            width: 48px;
+            height: 48px;
+            left: calc(50% - 24px);
+            top: calc(50% - 24px);
           }
         }
       }
@@ -1257,10 +1271,10 @@ $controlColor: #202020;
         .v3d-shade {
           .v3m-ready-icon {
             position: absolute;
-            width: 40px;
-            height: 40px;
-            left: calc(50% - 20px);
-            top: calc(50% - 20px);
+            width: 38px;
+            height: 38px;
+            left: calc(50% - 19px);
+            top: calc(50% - 19px);
           }
         }
 

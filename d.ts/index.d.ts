@@ -10,13 +10,20 @@ export interface V3dApplyParam {
   viewIndex?: number | undefined
   unique: string
   title: string
-  loadText?: string
+  load?: V3dLoading | undefined
 }
 
 export interface DPlayerContextMenuItem {
   text: string
   link?: string | undefined
-  click?: (() => void) | undefined
+  click?: ((player: any) => void) | undefined
+}
+
+export interface V3dLoading {
+  logo?: string | undefined
+  title: string
+  detail: string
+  loading?: string | undefined
 }
 
 export interface V3dMonitorOptions {
@@ -27,7 +34,7 @@ export interface V3dMonitorOptions {
   screenshot?: boolean | undefined
   src: string
   title?: string | undefined
-  loadText?: string | undefined
+  load?: V3dLoading | undefined
   unique?: string | undefined
   viewIndex?: number | undefined
   userData?: any | undefined

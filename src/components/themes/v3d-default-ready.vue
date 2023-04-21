@@ -24,10 +24,10 @@
 
   .v3m-ready-icon {
     position: absolute;
-    width: 96px;
-    height: 96px;
-    left: calc(50% - 48px);
-    top: calc(50% - 48px);
+    width: 80px;
+    height: 80px;
+    left: calc(50% - 40px);
+    top: calc(50% - 40px);
 
     path {
       fill: #333;
