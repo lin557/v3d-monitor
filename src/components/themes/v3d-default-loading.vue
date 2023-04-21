@@ -3,7 +3,12 @@
     <div class="v3m-content">
       <div class="v3m-logo">
         <div class="v3m-logo-img">
-          <img src="../../assets/logo-7.png" />
+          <template v-if="slots.logo">
+            <slot name="logo"></slot>
+          </template>
+          <template v-else>
+            <img src="../../assets/logo-7.png" />
+          </template>
         </div>
         <div class="v3m-logo-text">
           <div class="v3m-logo-text-top">
@@ -21,6 +26,11 @@
     </div>
   </div>
 </template>
+<script lang="ts" setup>
+import { useSlots } from 'vue'
+// 插槽
+const slots = useSlots()
+</script>
 <style lang="scss">
 .v3m-loading-line {
   height: 100%;
@@ -45,9 +55,11 @@
       width: 100%;
 
       .v3m-logo-img {
+        width: 48px;
+        height: 48px;
         img {
-          width: 48px;
-          height: 48px;
+          width: 100%;
+          height: 100%;
         }
       }
 

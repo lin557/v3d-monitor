@@ -19,7 +19,14 @@
           <template v-else>
             <!--themes-->
             <template v-if="isThemeDefault">
-              <v3d-default-ready />
+              <template v-if="slots.empty">
+                <v3d-default-ready>
+                  <slot name="empty"></slot>
+                </v3d-default-ready>
+              </template>
+              <template v-else>
+                <v3d-default-ready />
+              </template>
             </template>
           </template>
         </template>
@@ -30,11 +37,23 @@
           <template v-else>
             <!--themes-->
             <template v-if="isThemeDefault">
-              <v3d-default-loading>
-                <template v-slot:title> {{ item.title }} </template>
-                <template v-slot:detail> {{ item.detail }} </template>
-                <template v-slot:loading> {{ item.loading }} </template>
-              </v3d-default-loading>
+              <template v-if="slots.logo">
+                <v3d-default-loading>
+                  <template v-slot:logo>
+                    <slot name="logo"></slot>
+                  </template>
+                  <template v-slot:title> {{ item.title }} </template>
+                  <template v-slot:detail> {{ item.detail }} </template>
+                  <template v-slot:loading> {{ item.loading }} </template>
+                </v3d-default-loading>
+              </template>
+              <template v-else>
+                <v3d-default-loading>
+                  <template v-slot:title> {{ item.title }} </template>
+                  <template v-slot:detail> {{ item.detail }} </template>
+                  <template v-slot:loading> {{ item.loading }} </template>
+                </v3d-default-loading>
+              </template>
             </template>
           </template>
         </template>
@@ -836,6 +855,7 @@ defineExpose({
   play,
   setSelected,
   snapshot,
+  splitView,
   stop
 })
 </script>

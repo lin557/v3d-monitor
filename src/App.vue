@@ -14,6 +14,26 @@
       <template v-slot:loading>
         <div>123456</div>
       </template> -->
+      <!-- <template v-slot:empty>
+        <svg
+          t="1682041892928"
+          class="icon"
+          viewBox="0 0 1024 1024"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          p-id="13756"
+          width="128"
+          height="128"
+        >
+          <path
+            d="M514.048 128q79.872 0 149.504 30.208t121.856 82.432 82.432 122.368 30.208 150.016q0 78.848-30.208 148.48t-82.432 121.856-121.856 82.432-149.504 30.208-149.504-30.208-121.856-82.432-82.432-121.856-30.208-148.48q0-79.872 30.208-150.016t82.432-122.368 121.856-82.432 149.504-30.208z"
+            p-id="13757"
+          ></path>
+        </svg>
+      </template> -->
+      <!-- <template v-slot:logo>
+        <img src="./assets/ic_launcher.png" />
+      </template> -->
     </v3d-monitor>
 
     <div class="demo-control">
@@ -26,6 +46,8 @@
       <button @click="toggleControlBar">control-bar</button>
 
       <input type="number" v-model.number="closeTime" />
+      <button @click="setViewCount(4)">4</button>
+      <button @click="setViewCount(9)">9</button>
     </div>
 
     <div class="demo-title">
@@ -174,12 +196,15 @@ const controlBar = ref({
 
 const closeTime = ref(300)
 
+const setViewCount = (count: number) => {
+  refMonitor.value.splitView(count)
+}
+
 const apply = () => {
   refMonitor.value.apply({
     unique: 'h264.flv',
     title: 'aaa',
     load: {
-      //logo: '',
       title: '蒙H12388D',
       detail: 'CH1 高清',
       loading: '视频加载中'

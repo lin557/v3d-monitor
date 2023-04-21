@@ -20,7 +20,6 @@ export interface DPlayerContextMenuItem {
 }
 
 export interface V3dLoading {
-  logo?: string | undefined
   title: string
   detail: string
   loading?: string | undefined
