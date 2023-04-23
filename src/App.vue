@@ -2,7 +2,7 @@
   <div class="demo">
     <v3d-monitor
       ref="refMonitor"
-      :count="9"
+      :count="count"
       :lock-control="true"
       :duplicate="false"
       :control-bar="controlBar"
@@ -45,9 +45,22 @@
       <button @click="play(3)">play(3)</button>
       <button @click="toggleControlBar">control-bar</button>
 
-      <input type="number" v-model.number="closeTime" />
-      <button @click="setViewCount(4)">4</button>
+      <select v-model.number="count">
+        <option value="1">1</option>
+        <option value="4">4</option>
+        <option value="6">6</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="16">16</option>
+        <option value="25">25</option>
+        <option value="36">36</option>
+        <option value="64">64</option>
+      </select>
+
+      <button @click="setViewCount(6)">6</button>
       <button @click="setViewCount(9)">9</button>
+      <input type="number" v-model.number="closeTime" />
     </div>
 
     <div class="demo-title">
@@ -185,15 +198,15 @@ const controlBar = ref({
     '10',
     '16',
     '25',
-    '36',
-    '64',
     'fill',
     'mute',
     'stop',
     'clear'
   ]
 })
+// const controlBar1 = ref(true)
 
+const count = ref(4)
 const closeTime = ref(300)
 
 const setViewCount = (count: number) => {
@@ -213,6 +226,7 @@ const apply = () => {
 }
 
 const toggleControlBar = () => {
+  // controlBar1.value = false
   controlBar.value.enabled = !controlBar.value.enabled
 }
 
@@ -297,8 +311,14 @@ onMounted(() => {
 
   .demo-control {
     margin-top: 10px;
-    button {
+    button,
+    select,
+    input {
       margin-right: 6px;
+      min-width: 60px;
+    }
+    input {
+      width: 60px;
     }
   }
 
@@ -347,6 +367,11 @@ onMounted(() => {
       left: calc(50% - 40px);
       top: calc(50% - 40px);
     }
+  }
+
+  .v3m-loading {
+    width: 100%;
+    height: 100%;
   }
 
   .v3m-loading-1 {

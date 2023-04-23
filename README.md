@@ -1,3 +1,12 @@
+<p align="center">
+  <a href="https://www.npmjs.org/package/v3d-monitor">
+    <img src="https://img.shields.io/npm/v/v3d-monitor.svg">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg">
+  </a>
+</p>
+
 # Vue 3 + TypeScript + Vite 4
 
 Vue3 Multi-window video player
@@ -270,6 +279,7 @@ onMounted(() => {
 
 
 - `splitView(count: number)`
+  
   分屏,支持参数: 1, 4, 6, 8, 9, 10, 16, 25, 64
 
   

@@ -818,26 +818,57 @@ onMounted(() => {
   createView()
 })
 
-watch(props, (newValue, oldValue) => {
-  if (newValue.count !== oldValue.count) {
-    self.viewCount = fixViewCount(newValue.count)
+// watch(() => props.count, (newValue, oldValue) => {
+//   if (newValue !== oldValue) {
+//     self.viewCount = fixViewCount(newValue.count)
+//     createView()
+//   }
+//   // if (newValue.controlBar !== oldValue.controlBar) {
+//   // syncControlBar()
+//   // }
+//   console.log(props)
+//   self.viewCount = fixViewCount(props.count)
+//   createView()
+//   syncControlBar()
+// })
+
+watch(
+  () => props.count,
+  newValue => {
+    self.viewCount = fixViewCount(newValue)
     createView()
   }
-  if (newValue.controlBar !== oldValue.controlBar) {
-    console.log(newValue.controlBar)
+)
+
+watch(
+  () => props.controlBar,
+  () => {
     syncControlBar()
   }
-})
+)
 
-watch(self, newValue => {
-  if (newValue.viewCount === 1) {
-    if (self.viewMax) {
-      const index = self.viewMax.index
-      self.videos[index].cls = calcCls(index)
+watch(
+  () => self.viewCount,
+  newValue => {
+    if (newValue === 1) {
+      if (self.viewMax) {
+        const index = self.viewMax.index
+        self.videos[index].cls = calcCls(index)
+      }
+      self.viewMax = undefined
     }
-    self.viewMax = undefined
   }
-})
+)
+
+// watch(self, newValue => {
+//   if (newValue.viewCount === 1) {
+//     if (self.viewMax) {
+//       const index = self.viewMax.index
+//       self.videos[index].cls = calcCls(index)
+//     }
+//     self.viewMax = undefined
+//   }
+// })
 
 defineExpose({
   apply,
@@ -1138,11 +1169,8 @@ $controlColor: #202020;
 
         .v3d-shade {
           .v3m-ready-icon {
-            position: absolute;
             width: 64px;
             height: 64px;
-            left: calc(50% - 32px);
-            top: calc(50% - 32px);
           }
         }
       }
@@ -1169,11 +1197,8 @@ $controlColor: #202020;
 
         .v3d-shade {
           .v3m-ready-icon {
-            position: absolute;
             width: 64px;
             height: 64px;
-            left: calc(50% - 32px);
-            top: calc(50% - 32px);
           }
         }
       }
@@ -1194,11 +1219,8 @@ $controlColor: #202020;
 
         .v3d-shade {
           .v3m-ready-icon {
-            position: absolute;
             width: 64px;
             height: 64px;
-            left: calc(50% - 32px);
-            top: calc(50% - 32px);
           }
         }
       }
@@ -1224,11 +1246,8 @@ $controlColor: #202020;
 
         .v3d-shade {
           .v3m-ready-icon {
-            position: absolute;
             width: 64px;
             height: 64px;
-            left: calc(50% - 32px);
-            top: calc(50% - 32px);
           }
         }
       }
@@ -1247,11 +1266,8 @@ $controlColor: #202020;
 
         .v3d-shade {
           .v3m-ready-icon {
-            position: absolute;
             width: 52px;
             height: 52px;
-            left: calc(50% - 26px);
-            top: calc(50% - 26px);
           }
         }
       }
@@ -1269,11 +1285,8 @@ $controlColor: #202020;
 
         .v3d-shade {
           .v3m-ready-icon {
-            position: absolute;
             width: 48px;
             height: 48px;
-            left: calc(50% - 24px);
-            top: calc(50% - 24px);
           }
         }
       }
@@ -1290,11 +1303,8 @@ $controlColor: #202020;
 
         .v3d-shade {
           .v3m-ready-icon {
-            position: absolute;
-            width: 38px;
-            height: 38px;
-            left: calc(50% - 19px);
-            top: calc(50% - 19px);
+            width: 32px;
+            height: 32px;
           }
         }
 

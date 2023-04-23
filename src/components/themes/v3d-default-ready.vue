@@ -32,14 +32,16 @@ const slots = useSlots()
   background-position: 50%;
   background-size: cover;
   background-color: #010101;
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
   .v3m-ready-icon {
+    width: 80px;
+    height: 80px;
+
     svg {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      left: calc(50% - 40px);
-      top: calc(50% - 40px);
+      width: 100%;
+      height: 100%;
 
       path {
         fill: #333;
