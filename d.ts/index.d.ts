@@ -4920,6 +4920,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           })
       ) => void
       snapshot: (index: number) => void
+      splitView: (uCount: number) => void
       stop: () => void
     },
     unknown,
@@ -4989,7 +4990,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
   >,
   {
     ready: (_: {}) => any
+    empty: (_: {}) => any
     loading: (_: {}) => any
+    logo: (_: {}) => any
   }
 >
 export default V3dMonitor

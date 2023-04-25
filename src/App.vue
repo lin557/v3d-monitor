@@ -206,7 +206,7 @@ const controlBar = ref({
 })
 // const controlBar1 = ref(true)
 
-const count = ref(4)
+const count = ref(9)
 const closeTime = ref(300)
 
 const setViewCount = (count: number) => {
