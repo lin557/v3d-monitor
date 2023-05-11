@@ -74,19 +74,19 @@ onMounted(() => {
 
 ### 属性
 
-| 名称                 |      类型       |  默认值   | 描述                                                         |
-| -------------------- | :-------------: | :-------: | ------------------------------------------------------------ |
-| closeAfterViewChange |     boolean     |   false   | 当切换窗口布局时，被隐藏的窗口自动关闭视频                   |
-| controlBar           | boolean\|object |           | 控制栏参数                                                   |
-| count                |     number      |     4     | 窗口分屏数量                                                 |
+| 名称                 |      类型       |  默认值   | 描述                                                                       |
+| -------------------- | :-------------: | :-------: | -------------------------------------------------------------------------- |
+| closeAfterViewChange |     boolean     |   false   | 当切换窗口布局时，被隐藏的窗口自动关闭视频                                 |
+| controlBar           | boolean\|object |           | 控制栏参数                                                                 |
+| count                |     number      |     4     | 窗口分屏数量                                                               |
 | duplicate            |     boolean     |   false   | 是否允许使用同一个媒体地址源（url）打开多个窗口 true=允许 false=不允许重复 |
-| focused              |     boolean     |   true    | 是否显示焦点选框                                             |
-| fullscreen           |     boolean     |   true    | 是否显示全屏按钮                                             |
-| lockControl          |     string      |  'auto'   | 'auto'\|'none'\|'alway'是否显示一个常驻的工具栏              |
-| loopCreate           |     boolean     |   true    | 是否循环创建 不管其他窗口是否打开 关掉最先打开的窗口 并播放新的视频 |
-| screenshot           |     boolean     |   true    | 是否显示抓屏按钮                                             |
-| timeout              |     number      |   30000   | 超时时间，连接失败或成功后无数据流时超过一定时间触发         |
-| theme                |     string      | 'default' | 主题，默认为 'default'，目前只有一个，不用配置               |
+| focused              |     boolean     |   true    | 是否显示焦点选框                                                           |
+| fullscreen           |     boolean     |   true    | 是否显示全屏按钮                                                           |
+| lockControl          |     string      |  'auto'   | 'auto'\|'none'\|'alway'是否显示一个常驻的工具栏                            |
+| loopCreate           |     boolean     |   true    | 是否循环创建 不管其他窗口是否打开 关掉最先打开的窗口 并播放新的视频        |
+| screenshot           |     boolean     |   true    | 是否显示抓屏按钮                                                           |
+| timeout              |     number      |   30000   | 超时时间，连接失败或成功后无数据流时超过一定时间触发                       |
+| theme                |     string      | 'default' | 主题，默认为 'default'，目前只有一个，不用配置                             |
 
 `controlBar`对象说明
 
@@ -262,7 +262,7 @@ onMounted(() => {
 
 - `timeout` 超时事件
 
-  当连接上flv服务器后，一定时间内没有收到数据流，触发超时
+  当连接上 flv 服务器后，一定时间内没有收到数据流，触发超时
 
   当重连失败后，触发超时
 
@@ -271,14 +271,12 @@ onMounted(() => {
     ref="refMonitor"
     @timeout="doTimeout"
   >
-  
+
   // 参数类型：当前播放器 Player 对象
   const doTimeout = (player: Player) => {
     console.log(player.getOptions())
   }
   ```
-
-  
 
 ### 插槽
 

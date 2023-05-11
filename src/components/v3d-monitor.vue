@@ -13,6 +13,7 @@
         :class="item.cls"
         :timeout="props.timeout"
         @timeout="doTimeout"
+        @loadeddata="doLoadeddata(index)"
         @click="doClick(index)"
         @dblclick.stop.prevent="doDbClick(index)"
       >
@@ -145,7 +146,7 @@ const refView = ref()
 type Player = typeof V3dPlayer
 let refPlayers: Array<Player> = []
 
-const emits = defineEmits(['timeout'])
+const emits = defineEmits(['timeout', 'loadeddata'])
 
 type MergeObject = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -269,7 +270,7 @@ const _data: Data = {
     player: undefined
   },
   filled: true,
-  createOrder: 0,
+  createOrder: new Date().getTime(),
   controlBar: defaultControlBar
 }
 
@@ -392,17 +393,23 @@ const apply = (param: V3dApplyParam) => {
   }
   if (props.duplicate) {
     // 允许重复 判断有没有空的窗口
-    player = getIdleView()
+    player = getIdleView(undefined)
   } else {
     // 不允许重复 判断窗口是否正在播放中
     player = getPlaying(param.unique)
     if (player) {
       // 正在播放中 设置焦点
       setSelected(player)
-      return -1
+      if (player.status() === 1) {
+        // 正在占用
+        return player.index()
+      } else {
+        // 在播放 允许
+        return -1
+      }
     } else {
       // 没有在播放 获取一个空闲窗口
-      player = getIdleView()
+      player = getIdleView(param.unique)
     }
   }
 
@@ -534,6 +541,11 @@ const doDbClick = (index: number) => {
   }
 }
 
+const doLoadeddata = (index: number) => {
+  const player = getPlayerById(index)
+  emits('loadeddata', player)
+}
+
 const doTimeout = (index: number) => {
   const player = getPlayerById(index)
   emits('timeout', player)
@@ -580,16 +592,32 @@ const getEarlyView = () => {
 /**
  * 获取空闲视图
  */
-const getIdleView = () => {
+const getIdleView = (unique: string | undefined) => {
   // 没有在播放
+  let ret = undefined
   for (let i = 0; i < self.viewCount; i++) {
     const player = getPlayerById(self.videos[i].id)
     // 空的窗口 或 报错的窗口
     if (player.status() === 0 || player.status() === 4) {
-      return player
+      if (ret === undefined) {
+        ret = player
+      }
+      if (unique && player.unique() === unique) {
+        // 如果有指定id
+        return player
+      }
     }
   }
-  return undefined
+  return ret
+}
+
+const getOrderById = (id: number) => {
+  const player = getPlayerById(id)
+  if (player) {
+    return player.order()
+  } else {
+    return 0
+  }
 }
 
 /**
@@ -714,7 +742,7 @@ const play = (opts: V3dMonitorOptions) => {
     player = getPlayerById(opts.viewIndex)
   } else {
     // 获取空闲
-    player = getIdleView()
+    player = getIdleView(unique)
   }
   if (player) {
     const v3dOpts = handleOptions(opts)
@@ -757,7 +785,9 @@ const error = (index: number | Player, msg: string) => {
     player = index as Player
   }
   if (player) {
-    player.error(msg)
+    if (player.status() > 0) {
+      player.error(msg)
+    }
   }
 }
 
@@ -911,6 +941,7 @@ defineExpose({
   getEarlyView,
   getIdleView,
   getName,
+  getOrderById,
   getPlayerById,
   getPlaying,
   getSelected,
@@ -1189,7 +1220,7 @@ $controlColor: #202020;
           }
 
           .v3d-error-text {
-            top: calc(50% + 28px);
+            top: calc(50% + 32px);
           }
         }
       }
@@ -1230,7 +1261,7 @@ $controlColor: #202020;
           }
 
           .v3d-error-text {
-            top: calc(50% + 28px);
+            top: calc(50% + 32px);
           }
         }
       }
@@ -1269,7 +1300,7 @@ $controlColor: #202020;
           }
 
           .v3d-error-text {
-            top: calc(50% + 28px);
+            top: calc(50% + 32px);
           }
         }
       }
@@ -1302,7 +1333,7 @@ $controlColor: #202020;
           }
 
           .v3d-error-text {
-            top: calc(50% + 28px);
+            top: calc(50% + 32px);
           }
         }
       }
@@ -1340,7 +1371,7 @@ $controlColor: #202020;
           }
 
           .v3d-error-text {
-            top: calc(50% + 28px);
+            top: calc(50% + 32px);
           }
         }
       }
@@ -1364,10 +1395,10 @@ $controlColor: #202020;
           }
 
           .v3d-error-svg {
-            width: 42px;
-            height: 42px;
-            left: calc(50% - 21px);
-            top: calc(50% - 21px);
+            width: 36px;
+            height: 36px;
+            left: calc(50% - 18px);
+            top: calc(50% - 18px);
           }
 
           .v3d-error-text {
@@ -1394,10 +1425,10 @@ $controlColor: #202020;
           }
 
           .v3d-error-svg {
-            width: 32px;
-            height: 32px;
-            left: calc(50% - 16px);
-            top: calc(50% - 16px);
+            width: 30px;
+            height: 30px;
+            left: calc(50% - 15px);
+            top: calc(50% - 15px);
           }
 
           .v3d-error-text {
@@ -1430,7 +1461,7 @@ $controlColor: #202020;
           }
 
           .v3d-error-text {
-            top: calc(50% + 12px);
+            top: calc(50% + 13px);
           }
         }
 

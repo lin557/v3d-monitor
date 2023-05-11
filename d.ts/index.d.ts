@@ -6,7 +6,7 @@ export type Player = typeof V3dPlayer
 
 export { V3dDisplay } from 'v3d-player'
 
-export type V3dMonitorEvents = 'timeout'
+export type V3dMonitorEvents = 'timeout' | 'loadeddata'
 
 export interface V3dControlBar {
   enabled: boolean
@@ -168,9 +168,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                           loop: boolean
                           muted: boolean
                           mutex: boolean
-                          /**
-                           * 返回选中的窗口播放器
-                           */
                           preload: string
                           src: undefined
                           theme: string
@@ -307,6 +304,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 event:
                   | 'progress'
                   | 'timeout'
+                  | 'loadeddata'
                   | 'screenshot'
                   | 'fullscreen'
                   | 'play'
@@ -321,7 +319,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'emptied'
                   | 'ended'
                   | 'error'
-                  | 'loadeddata'
                   | 'loadedmetadata'
                   | 'loadstart'
                   | 'mozaudioavailable'
@@ -386,9 +383,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         loop: boolean
                         muted: boolean
                         mutex: boolean
-                        /**
-                         * 返回选中的窗口播放器
-                         */
                         preload: string
                         src: undefined
                         theme: string
@@ -539,6 +533,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 (
                   | 'progress'
                   | 'timeout'
+                  | 'loadeddata'
                   | 'screenshot'
                   | 'fullscreen'
                   | 'play'
@@ -553,7 +548,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'emptied'
                   | 'ended'
                   | 'error'
-                  | 'loadeddata'
                   | 'loadedmetadata'
                   | 'loadstart'
                   | 'mozaudioavailable'
@@ -732,9 +726,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     loop: boolean
                     muted: boolean
                     mutex: boolean
-                    /**
-                     * 返回选中的窗口播放器
-                     */
                     preload: string
                     src: undefined
                     theme: string
@@ -919,9 +910,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     loop: boolean
                     muted: boolean
                     mutex: boolean
-                    /**
-                     * 返回选中的窗口播放器
-                     */
                     preload: string
                     src: undefined
                     theme: string
@@ -1072,6 +1060,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             (
               | 'progress'
               | 'timeout'
+              | 'loadeddata'
               | 'screenshot'
               | 'fullscreen'
               | 'play'
@@ -1086,7 +1075,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'emptied'
               | 'ended'
               | 'error'
-              | 'loadeddata'
               | 'loadedmetadata'
               | 'loadstart'
               | 'mozaudioavailable'
@@ -1111,6 +1099,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             )[],
             | 'progress'
             | 'timeout'
+            | 'loadeddata'
             | 'screenshot'
             | 'fullscreen'
             | 'play'
@@ -1125,7 +1114,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             | 'emptied'
             | 'ended'
             | 'error'
-            | 'loadeddata'
             | 'loadedmetadata'
             | 'loadstart'
             | 'mozaudioavailable'
@@ -1171,7 +1159,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               }
             }))
         | null
-      getIdleView: () =>
+      getIdleView: (unique: string | undefined) =>
         | ({
             new (...args: any[]): {
               $: import('vue').ComponentInternalInstance
@@ -1227,9 +1215,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                           loop: boolean
                           muted: boolean
                           mutex: boolean
-                          /**
-                           * 返回选中的窗口播放器
-                           */
                           preload: string
                           src: undefined
                           theme: string
@@ -1366,6 +1351,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 event:
                   | 'progress'
                   | 'timeout'
+                  | 'loadeddata'
                   | 'screenshot'
                   | 'fullscreen'
                   | 'play'
@@ -1380,7 +1366,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'emptied'
                   | 'ended'
                   | 'error'
-                  | 'loadeddata'
                   | 'loadedmetadata'
                   | 'loadstart'
                   | 'mozaudioavailable'
@@ -1445,9 +1430,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         loop: boolean
                         muted: boolean
                         mutex: boolean
-                        /**
-                         * 返回选中的窗口播放器
-                         */
                         preload: string
                         src: undefined
                         theme: string
@@ -1598,6 +1580,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 (
                   | 'progress'
                   | 'timeout'
+                  | 'loadeddata'
                   | 'screenshot'
                   | 'fullscreen'
                   | 'play'
@@ -1612,7 +1595,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'emptied'
                   | 'ended'
                   | 'error'
-                  | 'loadeddata'
                   | 'loadedmetadata'
                   | 'loadstart'
                   | 'mozaudioavailable'
@@ -1791,9 +1773,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     loop: boolean
                     muted: boolean
                     mutex: boolean
-                    /**
-                     * 返回选中的窗口播放器
-                     */
                     preload: string
                     src: undefined
                     theme: string
@@ -1978,9 +1957,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     loop: boolean
                     muted: boolean
                     mutex: boolean
-                    /**
-                     * 返回选中的窗口播放器
-                     */
                     preload: string
                     src: undefined
                     theme: string
@@ -2131,6 +2107,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             (
               | 'progress'
               | 'timeout'
+              | 'loadeddata'
               | 'screenshot'
               | 'fullscreen'
               | 'play'
@@ -2145,7 +2122,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'emptied'
               | 'ended'
               | 'error'
-              | 'loadeddata'
               | 'loadedmetadata'
               | 'loadstart'
               | 'mozaudioavailable'
@@ -2170,6 +2146,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             )[],
             | 'progress'
             | 'timeout'
+            | 'loadeddata'
             | 'screenshot'
             | 'fullscreen'
             | 'play'
@@ -2184,7 +2161,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             | 'emptied'
             | 'ended'
             | 'error'
-            | 'loadeddata'
             | 'loadedmetadata'
             | 'loadstart'
             | 'mozaudioavailable'
@@ -2231,6 +2207,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             }))
         | undefined
       getName: (url: string | undefined) => string
+      getOrderById: (id: number) => any
       getPlayerById: (id: number) => {
         new (...args: any[]): {
           $: import('vue').ComponentInternalInstance
@@ -2286,9 +2263,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       loop: boolean
                       muted: boolean
                       mutex: boolean
-                      /**
-                       * 返回选中的窗口播放器
-                       */
                       preload: string
                       src: undefined
                       theme: string
@@ -2425,6 +2399,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             event:
               | 'progress'
               | 'timeout'
+              | 'loadeddata'
               | 'screenshot'
               | 'fullscreen'
               | 'play'
@@ -2439,7 +2414,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'emptied'
               | 'ended'
               | 'error'
-              | 'loadeddata'
               | 'loadedmetadata'
               | 'loadstart'
               | 'mozaudioavailable'
@@ -2504,9 +2478,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     loop: boolean
                     muted: boolean
                     mutex: boolean
-                    /**
-                     * 返回选中的窗口播放器
-                     */
                     preload: string
                     src: undefined
                     theme: string
@@ -2657,6 +2628,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             (
               | 'progress'
               | 'timeout'
+              | 'loadeddata'
               | 'screenshot'
               | 'fullscreen'
               | 'play'
@@ -2671,7 +2643,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'emptied'
               | 'ended'
               | 'error'
-              | 'loadeddata'
               | 'loadedmetadata'
               | 'loadstart'
               | 'mozaudioavailable'
@@ -2850,9 +2821,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 loop: boolean
                 muted: boolean
                 mutex: boolean
-                /**
-                 * 返回选中的窗口播放器
-                 */
                 preload: string
                 src: undefined
                 theme: string
@@ -3037,9 +3005,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 loop: boolean
                 muted: boolean
                 mutex: boolean
-                /**
-                 * 返回选中的窗口播放器
-                 */
                 preload: string
                 src: undefined
                 theme: string
@@ -3190,6 +3155,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         (
           | 'progress'
           | 'timeout'
+          | 'loadeddata'
           | 'screenshot'
           | 'fullscreen'
           | 'play'
@@ -3204,7 +3170,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           | 'emptied'
           | 'ended'
           | 'error'
-          | 'loadeddata'
           | 'loadedmetadata'
           | 'loadstart'
           | 'mozaudioavailable'
@@ -3229,6 +3194,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         )[],
         | 'progress'
         | 'timeout'
+        | 'loadeddata'
         | 'screenshot'
         | 'fullscreen'
         | 'play'
@@ -3243,7 +3209,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         | 'emptied'
         | 'ended'
         | 'error'
-        | 'loadeddata'
         | 'loadedmetadata'
         | 'loadstart'
         | 'mozaudioavailable'
@@ -3344,9 +3309,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                           loop: boolean
                           muted: boolean
                           mutex: boolean
-                          /**
-                           * 返回选中的窗口播放器
-                           */
                           preload: string
                           src: undefined
                           theme: string
@@ -3483,6 +3445,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 event:
                   | 'progress'
                   | 'timeout'
+                  | 'loadeddata'
                   | 'screenshot'
                   | 'fullscreen'
                   | 'play'
@@ -3497,7 +3460,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'emptied'
                   | 'ended'
                   | 'error'
-                  | 'loadeddata'
                   | 'loadedmetadata'
                   | 'loadstart'
                   | 'mozaudioavailable'
@@ -3562,9 +3524,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         loop: boolean
                         muted: boolean
                         mutex: boolean
-                        /**
-                         * 返回选中的窗口播放器
-                         */
                         preload: string
                         src: undefined
                         theme: string
@@ -3715,6 +3674,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 (
                   | 'progress'
                   | 'timeout'
+                  | 'loadeddata'
                   | 'screenshot'
                   | 'fullscreen'
                   | 'play'
@@ -3729,7 +3689,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'emptied'
                   | 'ended'
                   | 'error'
-                  | 'loadeddata'
                   | 'loadedmetadata'
                   | 'loadstart'
                   | 'mozaudioavailable'
@@ -3908,9 +3867,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     loop: boolean
                     muted: boolean
                     mutex: boolean
-                    /**
-                     * 返回选中的窗口播放器
-                     */
                     preload: string
                     src: undefined
                     theme: string
@@ -4095,9 +4051,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     loop: boolean
                     muted: boolean
                     mutex: boolean
-                    /**
-                     * 返回选中的窗口播放器
-                     */
                     preload: string
                     src: undefined
                     theme: string
@@ -4248,6 +4201,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             (
               | 'progress'
               | 'timeout'
+              | 'loadeddata'
               | 'screenshot'
               | 'fullscreen'
               | 'play'
@@ -4262,7 +4216,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'emptied'
               | 'ended'
               | 'error'
-              | 'loadeddata'
               | 'loadedmetadata'
               | 'loadstart'
               | 'mozaudioavailable'
@@ -4287,6 +4240,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             )[],
             | 'progress'
             | 'timeout'
+            | 'loadeddata'
             | 'screenshot'
             | 'fullscreen'
             | 'play'
@@ -4301,7 +4255,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             | 'emptied'
             | 'ended'
             | 'error'
-            | 'loadeddata'
             | 'loadedmetadata'
             | 'loadstart'
             | 'mozaudioavailable'
@@ -4402,9 +4355,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       loop: boolean
                       muted: boolean
                       mutex: boolean
-                      /**
-                       * 返回选中的窗口播放器
-                       */
                       preload: string
                       src: undefined
                       theme: string
@@ -4541,6 +4491,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             event:
               | 'progress'
               | 'timeout'
+              | 'loadeddata'
               | 'screenshot'
               | 'fullscreen'
               | 'play'
@@ -4555,7 +4506,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'emptied'
               | 'ended'
               | 'error'
-              | 'loadeddata'
               | 'loadedmetadata'
               | 'loadstart'
               | 'mozaudioavailable'
@@ -4620,9 +4570,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     loop: boolean
                     muted: boolean
                     mutex: boolean
-                    /**
-                     * 返回选中的窗口播放器
-                     */
                     preload: string
                     src: undefined
                     theme: string
@@ -4773,6 +4720,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             (
               | 'progress'
               | 'timeout'
+              | 'loadeddata'
               | 'screenshot'
               | 'fullscreen'
               | 'play'
@@ -4787,7 +4735,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'emptied'
               | 'ended'
               | 'error'
-              | 'loadeddata'
               | 'loadedmetadata'
               | 'loadstart'
               | 'mozaudioavailable'
@@ -4966,9 +4913,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 loop: boolean
                 muted: boolean
                 mutex: boolean
-                /**
-                 * 返回选中的窗口播放器
-                 */
                 preload: string
                 src: undefined
                 theme: string
@@ -5153,9 +5097,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 loop: boolean
                 muted: boolean
                 mutex: boolean
-                /**
-                 * 返回选中的窗口播放器
-                 */
                 preload: string
                 src: undefined
                 theme: string
@@ -5306,6 +5247,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         (
           | 'progress'
           | 'timeout'
+          | 'loadeddata'
           | 'screenshot'
           | 'fullscreen'
           | 'play'
@@ -5320,7 +5262,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           | 'emptied'
           | 'ended'
           | 'error'
-          | 'loadeddata'
           | 'loadedmetadata'
           | 'loadstart'
           | 'mozaudioavailable'
@@ -5345,6 +5286,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         )[],
         | 'progress'
         | 'timeout'
+        | 'loadeddata'
         | 'screenshot'
         | 'fullscreen'
         | 'play'
@@ -5359,7 +5301,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         | 'emptied'
         | 'ended'
         | 'error'
-        | 'loadeddata'
         | 'loadedmetadata'
         | 'loadstart'
         | 'mozaudioavailable'
@@ -5463,9 +5404,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         loop: boolean
                         muted: boolean
                         mutex: boolean
-                        /**
-                         * 返回选中的窗口播放器
-                         */
                         preload: string
                         src: undefined
                         theme: string
@@ -5602,6 +5540,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               event:
                 | 'progress'
                 | 'timeout'
+                | 'loadeddata'
                 | 'screenshot'
                 | 'fullscreen'
                 | 'play'
@@ -5616,7 +5555,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 | 'emptied'
                 | 'ended'
                 | 'error'
-                | 'loadeddata'
                 | 'loadedmetadata'
                 | 'loadstart'
                 | 'mozaudioavailable'
@@ -5681,9 +5619,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       loop: boolean
                       muted: boolean
                       mutex: boolean
-                      /**
-                       * 返回选中的窗口播放器
-                       */
                       preload: string
                       src: undefined
                       theme: string
@@ -5834,6 +5769,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               (
                 | 'progress'
                 | 'timeout'
+                | 'loadeddata'
                 | 'screenshot'
                 | 'fullscreen'
                 | 'play'
@@ -5848,7 +5784,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 | 'emptied'
                 | 'ended'
                 | 'error'
-                | 'loadeddata'
                 | 'loadedmetadata'
                 | 'loadstart'
                 | 'mozaudioavailable'
@@ -6027,9 +5962,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   loop: boolean
                   muted: boolean
                   mutex: boolean
-                  /**
-                   * 返回选中的窗口播放器
-                   */
                   preload: string
                   src: undefined
                   theme: string
@@ -6214,9 +6146,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   loop: boolean
                   muted: boolean
                   mutex: boolean
-                  /**
-                   * 返回选中的窗口播放器
-                   */
                   preload: string
                   src: undefined
                   theme: string
@@ -6367,6 +6296,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           (
             | 'progress'
             | 'timeout'
+            | 'loadeddata'
             | 'screenshot'
             | 'fullscreen'
             | 'play'
@@ -6381,7 +6311,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             | 'emptied'
             | 'ended'
             | 'error'
-            | 'loadeddata'
             | 'loadedmetadata'
             | 'loadstart'
             | 'mozaudioavailable'
@@ -6406,6 +6335,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           )[],
           | 'progress'
           | 'timeout'
+          | 'loadeddata'
           | 'screenshot'
           | 'fullscreen'
           | 'play'
@@ -6420,7 +6350,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           | 'emptied'
           | 'ended'
           | 'error'
-          | 'loadeddata'
           | 'loadedmetadata'
           | 'loadstart'
           | 'mozaudioavailable'
@@ -6524,9 +6453,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                             loop: boolean
                             muted: boolean
                             mutex: boolean
-                            /**
-                             * 返回选中的窗口播放器
-                             */
                             preload: string
                             src: undefined
                             theme: string
@@ -6667,6 +6593,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   event:
                     | 'progress'
                     | 'timeout'
+                    | 'loadeddata'
                     | 'screenshot'
                     | 'fullscreen'
                     | 'play'
@@ -6681,7 +6608,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     | 'emptied'
                     | 'ended'
                     | 'error'
-                    | 'loadeddata'
                     | 'loadedmetadata'
                     | 'loadstart'
                     | 'mozaudioavailable'
@@ -6746,9 +6672,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                           loop: boolean
                           muted: boolean
                           mutex: boolean
-                          /**
-                           * 返回选中的窗口播放器
-                           */
                           preload: string
                           src: undefined
                           theme: string
@@ -6905,6 +6828,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   (
                     | 'progress'
                     | 'timeout'
+                    | 'loadeddata'
                     | 'screenshot'
                     | 'fullscreen'
                     | 'play'
@@ -6919,7 +6843,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     | 'emptied'
                     | 'ended'
                     | 'error'
-                    | 'loadeddata'
                     | 'loadedmetadata'
                     | 'loadstart'
                     | 'mozaudioavailable'
@@ -7098,9 +7021,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       loop: boolean
                       muted: boolean
                       mutex: boolean
-                      /**
-                       * 返回选中的窗口播放器
-                       */
                       preload: string
                       src: undefined
                       theme: string
@@ -7285,9 +7205,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       loop: boolean
                       muted: boolean
                       mutex: boolean
-                      /**
-                       * 返回选中的窗口播放器
-                       */
                       preload: string
                       src: undefined
                       theme: string
@@ -7438,6 +7355,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               (
                 | 'progress'
                 | 'timeout'
+                | 'loadeddata'
                 | 'screenshot'
                 | 'fullscreen'
                 | 'play'
@@ -7452,7 +7370,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 | 'emptied'
                 | 'ended'
                 | 'error'
-                | 'loadeddata'
                 | 'loadedmetadata'
                 | 'loadstart'
                 | 'mozaudioavailable'
@@ -7477,6 +7394,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               )[],
               | 'progress'
               | 'timeout'
+              | 'loadeddata'
               | 'screenshot'
               | 'fullscreen'
               | 'play'
@@ -7491,7 +7409,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'emptied'
               | 'ended'
               | 'error'
-              | 'loadeddata'
               | 'loadedmetadata'
               | 'loadstart'
               | 'mozaudioavailable'
@@ -7547,8 +7464,8 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
     {},
     import('vue').ComponentOptionsMixin,
     import('vue').ComponentOptionsMixin,
-    'timeout'[],
-    'timeout',
+    ('timeout' | 'loadeddata')[],
+    'timeout' | 'loadeddata',
     import('vue').VNodeProps &
       import('vue').AllowedComponentProps &
       import('vue').ComponentCustomProps,
@@ -7607,6 +7524,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         }
       }>
     > & {
+      onLoadeddata?: ((...args: any[]) => any) | undefined
       onTimeout?: ((...args: any[]) => any) | undefined
     },
     {

@@ -4,13 +4,14 @@
       ref="refMonitor"
       :count="count"
       :lock-controls="lockControls"
-      :timeout="10000"
+      :timeout="3000"
       :duplicate="false"
       :control-bar="controlBar"
       :close-time="closeTime"
       :fullscreen="fullscreen"
       :screenshot="screenshot"
       @timeout="doTimeout"
+      @loadeddata="doLoadedData"
     >
       <!-- <template v-slot:ready>
         <div>abc</div>
@@ -226,7 +227,7 @@ const setViewCount = (count: number) => {
 }
 
 const apply = () => {
-  refMonitor.value.apply({
+  const id = refMonitor.value.apply({
     unique: 'h264.flv',
     title: 'aaa',
     load: {
@@ -235,6 +236,12 @@ const apply = () => {
       loading: '视频加载中'
     }
   })
+
+  console.log(id, refMonitor.value.getOrderById(id))
+}
+
+const doLoadedData = (player: Player) => {
+  console.log('doLoadedData', player.order())
 }
 
 const doTimeout = (player: Player) => {
@@ -255,8 +262,7 @@ const toggleControlBar = () => {
 }
 
 const showError = () => {
-  const player = refMonitor.value.getIdleView()
-  refMonitor.value.error(player, 'error message')
+  refMonitor.value.error(0, 'error message')
 }
 
 const play = (index: number) => {
