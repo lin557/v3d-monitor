@@ -84,7 +84,7 @@ const slots = useSlots()
 
     .loading-line {
       margin: 16px 0 12px;
-      height: 1.2px;
+      height: 2px;
       width: 100%;
       background-image: linear-gradient(
         90deg,

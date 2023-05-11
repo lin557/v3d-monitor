@@ -7,8 +7,12 @@
         :ref="setPlayerRef"
         :border="item.border"
         :index="index"
-        :lock-control="item.lockControl"
+        :controls="props.lockControls"
+        :screenshot="props.screenshot"
+        :fullscreen="props.fullscreen"
         :class="item.cls"
+        :timeout="props.timeout"
+        @timeout="doTimeout"
         @click="doClick(index)"
         @dblclick.stop.prevent="doDbClick(index)"
       >
@@ -141,6 +145,8 @@ const refView = ref()
 type Player = typeof V3dPlayer
 let refPlayers: Array<Player> = []
 
+const emits = defineEmits(['timeout'])
+
 type MergeObject = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key in string | number]: any
@@ -191,17 +197,30 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  // 关闭时间 秒
+  // 关闭时间 毫秒
   closeTime: {
     type: Number,
     default: 0
   },
+  // 超时时间 毫秒
+  timeout: {
+    type: Number,
+    default: 10000
+  },
   /**
    * 常驻工具栏
    */
-  lockControl: {
+  lockControls: {
+    type: String,
+    default: 'auto'
+  },
+  screenshot: {
     type: Boolean,
-    default: false
+    default: true
+  },
+  fullscreen: {
+    type: Boolean,
+    default: true
   },
   // 循环创建 不管其他窗口是否打开 关掉最先打开的窗口 并播放新的视频
   loopCreate: {
@@ -222,7 +241,6 @@ interface SelectedParam {
 interface VideoParam {
   id: number
   cls: string
-  lockControl: boolean
   border: boolean
   title?: string
   detail?: string
@@ -488,7 +506,6 @@ const createView = () => {
       self.videos.push({
         id: i,
         cls: calcCls(i),
-        lockControl: props.lockControl,
         border: true,
         title: 'DIGITAL VIDEO',
         detail: '',
@@ -515,6 +532,11 @@ const doDbClick = (index: number) => {
     self.viewMax = player
     self.videos[index].cls = calcCls(index) + ' v3d-max'
   }
+}
+
+const doTimeout = (index: number) => {
+  const player = getPlayerById(index)
+  emits('timeout', player)
 }
 
 /**
@@ -632,7 +654,6 @@ const handleOptions = (opts: V3dMonitorOptions) => {
     order: newOrder(),
     preventClickToggle: true,
     record: true,
-    screenshot: opts.screenshot,
     src: opts.src,
     title: opts.title,
     unique: unique,
@@ -725,6 +746,18 @@ const setSelected = (player: Player) => {
 const setPlayerRef = (el: any) => {
   if (el) {
     refPlayers.push(el)
+  }
+}
+
+const error = (index: number | Player, msg: string) => {
+  let player
+  if ('[object Number]' === Object.prototype.toString.call(index)) {
+    player = getPlayerById(index as number)
+  } else {
+    player = index as Player
+  }
+  if (player) {
+    player.error(msg)
   }
 }
 
@@ -885,6 +918,7 @@ defineExpose({
   muted,
   play,
   setSelected,
+  error,
   snapshot,
   splitView,
   stop
@@ -899,6 +933,7 @@ $controlColor: #202020;
   width: 100%;
   height: 100%;
   position: relative;
+  overflow: hidden;
 
   .v3m-control {
     width: 100%;
@@ -1142,13 +1177,27 @@ $controlColor: #202020;
 
     &.v3m-6s {
       .v3d-player {
-        height: 33.3341%;
-        width: 33.33%;
+        height: 33.33333%;
+        width: 33.33334%;
+
+        .v3d-shade {
+          .v3d-error-svg {
+            width: 48px;
+            height: 48px;
+            left: calc(50% - 24px);
+            top: calc(50% - 24px);
+          }
+
+          .v3d-error-text {
+            top: calc(50% + 28px);
+          }
+        }
       }
 
       .v3m-s0 {
-        height: 66.65%;
-        width: 66.66%;
+        // 缩放测试 得出66.663%
+        height: 66.663%;
+        width: 66.66666%;
       }
 
       .v3m-m8,
@@ -1172,6 +1221,17 @@ $controlColor: #202020;
             width: 64px;
             height: 64px;
           }
+
+          .v3d-error-svg {
+            width: 48px;
+            height: 48px;
+            left: calc(50% - 24px);
+            top: calc(50% - 24px);
+          }
+
+          .v3d-error-text {
+            top: calc(50% + 28px);
+          }
         }
       }
 
@@ -1192,13 +1252,24 @@ $controlColor: #202020;
 
     &.v3m-9s {
       .v3d-player {
-        height: 33.3341%;
-        width: 33.33%;
+        height: 33.33333%;
+        width: 33.33334%;
 
         .v3d-shade {
           .v3m-ready-icon {
             width: 64px;
             height: 64px;
+          }
+
+          .v3d-error-svg {
+            width: 48px;
+            height: 48px;
+            left: calc(50% - 24px);
+            top: calc(50% - 24px);
+          }
+
+          .v3d-error-text {
+            top: calc(50% + 28px);
           }
         }
       }
@@ -1221,6 +1292,17 @@ $controlColor: #202020;
           .v3m-ready-icon {
             width: 64px;
             height: 64px;
+          }
+
+          .v3d-error-svg {
+            width: 48px;
+            height: 48px;
+            left: calc(50% - 24px);
+            top: calc(50% - 24px);
+          }
+
+          .v3d-error-text {
+            top: calc(50% + 28px);
           }
         }
       }
@@ -1249,6 +1331,17 @@ $controlColor: #202020;
             width: 64px;
             height: 64px;
           }
+
+          .v3d-error-svg {
+            width: 48px;
+            height: 48px;
+            left: calc(50% - 24px);
+            top: calc(50% - 24px);
+          }
+
+          .v3d-error-text {
+            top: calc(50% + 28px);
+          }
         }
       }
 
@@ -1269,6 +1362,17 @@ $controlColor: #202020;
             width: 52px;
             height: 52px;
           }
+
+          .v3d-error-svg {
+            width: 42px;
+            height: 42px;
+            left: calc(50% - 21px);
+            top: calc(50% - 21px);
+          }
+
+          .v3d-error-text {
+            top: calc(50% + 26px);
+          }
         }
       }
 
@@ -1288,6 +1392,17 @@ $controlColor: #202020;
             width: 48px;
             height: 48px;
           }
+
+          .v3d-error-svg {
+            width: 32px;
+            height: 32px;
+            left: calc(50% - 16px);
+            top: calc(50% - 16px);
+          }
+
+          .v3d-error-text {
+            top: calc(50% + 18px);
+          }
         }
       }
 
@@ -1305,6 +1420,17 @@ $controlColor: #202020;
           .v3m-ready-icon {
             width: 32px;
             height: 32px;
+          }
+
+          .v3d-error-svg {
+            width: 24px;
+            height: 24px;
+            left: calc(50% - 12px);
+            top: calc(50% - 12px);
+          }
+
+          .v3d-error-text {
+            top: calc(50% + 12px);
           }
         }
 

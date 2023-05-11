@@ -3,10 +3,14 @@
     <v3d-monitor
       ref="refMonitor"
       :count="count"
-      :lock-control="true"
+      :lock-controls="lockControls"
+      :timeout="10000"
       :duplicate="false"
       :control-bar="controlBar"
       :close-time="closeTime"
+      :fullscreen="fullscreen"
+      :screenshot="screenshot"
+      @timeout="doTimeout"
     >
       <!-- <template v-slot:ready>
         <div>abc</div>
@@ -61,6 +65,9 @@
       <button @click="setViewCount(6)">6</button>
       <button @click="setViewCount(9)">9</button>
       <input type="number" v-model.number="closeTime" />
+      <button @click="toggleShot">screenshot</button>
+      <button @click="toggleFull">fullscreen</button>
+      <button @click="showError">error</button>
     </div>
 
     <div class="demo-title">
@@ -184,11 +191,13 @@ import 'v3d-player/dist/style.css'
 
 import V3dDefaultReady from './components/themes/v3d-default-ready.vue'
 
+import { Player } from '../d.ts/index'
+
 const refMonitor = ref()
 
 const controlBar = ref({
   enabled: true,
-  position: 'bottom',
+  position: 'top',
   button: [
     '1',
     '4',
@@ -204,10 +213,13 @@ const controlBar = ref({
     'clear'
   ]
 })
-// const controlBar1 = ref(true)
+
+const lockControls = ref('auto')
 
 const count = ref(9)
-const closeTime = ref(300)
+const closeTime = ref(13000)
+const screenshot = ref(true)
+const fullscreen = ref(true)
 
 const setViewCount = (count: number) => {
   refMonitor.value.splitView(count)
@@ -225,9 +237,26 @@ const apply = () => {
   })
 }
 
+const doTimeout = (player: Player) => {
+  console.log(player.getOptions())
+}
+
+const toggleShot = () => {
+  screenshot.value = !screenshot.value
+}
+
+const toggleFull = () => {
+  fullscreen.value = !fullscreen.value
+}
+
 const toggleControlBar = () => {
   // controlBar1.value = false
   controlBar.value.enabled = !controlBar.value.enabled
+}
+
+const showError = () => {
+  const player = refMonitor.value.getIdleView()
+  refMonitor.value.error(player, 'error message')
 }
 
 const play = (index: number) => {
@@ -259,7 +288,6 @@ const play = (index: number) => {
     {
       title: 'oceans.mp4',
       src: 'https://vjs.zencdn.net/v/oceans.mp4',
-      screenshot: true,
       load: {
         title: '蒙H12388D',
         detail: 'CH1 高清',
@@ -270,13 +298,16 @@ const play = (index: number) => {
       allowPause: true,
       loadText: '蒙H12388D CH1 高清',
       title: '蒙H12388D CH1',
-      src: 'https://dno-xiu-hd.youku.com/lfgame/cmcu_alias_3567125494_8148028.flv?auth_key=1713350365-0-0-6e1ba74b2a57fce3d97f46c991074a23'
+      src: 'https://dno-xiu-hd.youku.com/lfgame/cmcu_alias_3567125494_8148028.flv?auth_key=1713350365-0-0-6e1ba74b2a57fce3d97f46c991074a23',
+      userData: {
+        test1: '1',
+        test2: '2'
+      }
     },
     {
       allowPause: true,
       title: '浙江卫视',
-      src: 'http://hw-vl.cztv.com/channels/lantian/channel01/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=d0c0b9d2821a784c8527a7892b0555bf&t=1680572871',
-      screenshot: true
+      src: 'http://hw-vl.cztv.com/channels/lantian/channel01/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=d0c0b9d2821a784c8527a7892b0555bf&t=1680572871'
     }
   ]
 

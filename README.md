@@ -11,8 +11,6 @@
 
 Vue3 Multi-window video player
 
-
-
 ## 安装
 
 ```
@@ -44,7 +42,7 @@ Install v3d-monitor via npm and import the plugin as you would any other module.
 import { ref, onMounted } from 'vue'
 import V3dMonitor from 'v3d-monitor'
 import 'v3d-monitor/dist/style.css'
-    
+
 const refMonitor = ref()
 
 const play = () => {
@@ -83,8 +81,11 @@ onMounted(() => {
 | count                |     number      |     4     | 窗口分屏数量                                                 |
 | duplicate            |     boolean     |   false   | 是否允许使用同一个媒体地址源（url）打开多个窗口 true=允许 false=不允许重复 |
 | focused              |     boolean     |   true    | 是否显示焦点选框                                             |
-| lockControl          |     boolean     |   false   | 是否显示一个常驻的工具栏                                     |
+| fullscreen           |     boolean     |   true    | 是否显示全屏按钮                                             |
+| lockControl          |     string      |  'auto'   | 'auto'\|'none'\|'alway'是否显示一个常驻的工具栏              |
 | loopCreate           |     boolean     |   true    | 是否循环创建 不管其他窗口是否打开 关掉最先打开的窗口 并播放新的视频 |
+| screenshot           |     boolean     |   true    | 是否显示抓屏按钮                                             |
+| timeout              |     number      |   30000   | 超时时间，连接失败或成功后无数据流时超过一定时间触发         |
 | theme                |     string      | 'default' | 主题，默认为 'default'，目前只有一个，不用配置               |
 
 `controlBar`对象说明
@@ -113,8 +114,6 @@ onMounted(() => {
 }
 ```
 
-
-
 ### 方法
 
 - `apply(param: V3dApplyParam)`
@@ -123,12 +122,12 @@ onMounted(() => {
 
   参数说明 `V3dApplyParam`
 
-  | 名称      |  类型  | 默认值    | 描述                                                         |
-  | --------- | :----: | --------- | ------------------------------------------------------------ |
+  | 名称      |  类型  | 默认值    | 描述                                                                      |
+  | --------- | :----: | --------- | ------------------------------------------------------------------------- |
   | viewIndex | number | undefined | 优先占用指定窗口，窗口索引从 0 开始。不指定时将自动选择下标最小的空白窗口 |
-  | unique    | string | none      | 唯一标识，用于同一视频源的重复判断，一般为文件名             |
-  | title     | string | none      | 窗口标题，显示在底部的控制栏上                               |
-  | load      | object | undefined | 配合`theme`，在加载界面上显示的文字                          |
+  | unique    | string | none      | 唯一标识，用于同一视频源的重复判断，一般为文件名                          |
+  | title     | string | none      | 窗口标题，显示在底部的控制栏上                                            |
+  | load      | object | undefined | 配合`theme`，在加载界面上显示的文字                                       |
 
   `load` 说明
 
@@ -159,67 +158,45 @@ onMounted(() => {
   }
   ```
 
-  
-
 - `close(index: number)`
 
   关闭指定的视频窗口
-
-  
 
 - `clear()`
 
   关闭所有视频窗口
 
-  
-
 - `filled(fill: boolean)`
 
   设置视频是否全屏显示，true=全屏 false=原始比例
-
-  
 
 - `getEarlyView()`
 
   获取最早创建的窗口播放器，包括被占用 或 播放中 或 报错的窗口
 
-  
-
 - `getIdleView()`
 
   获取空闲窗口播放器
-
-  
 
 - `getPlayerById(index: number)`
 
   通过索引获取窗口播放器对象
 
-  
-
 - `getPlaying(unique: string)`
 
   通过播放信息判断窗口是否正在播放中
-
-  
 
 - `getSelected()`
 
   返回选中的窗口播放器
 
-  
-
 - `getViewCount()`
 
   返回当前的画面窗口数量
 
-  
-
 - `muted()`
 
   静音所有窗口
-
-  
 
 - `play(opts: V3dMonitorOptions)`
 
@@ -269,38 +246,45 @@ onMounted(() => {
   }
   ```
 
-  
-
 - `snapshot(index: number)`
 
   抓拍指定的窗口
 
-
-
-
 - `splitView(count: number)`
-  
-  分屏,支持参数: 1, 4, 6, 8, 9, 10, 16, 25, 64
 
-  
+  分屏,支持参数: 1, 4, 6, 8, 9, 10, 16, 25, 64
 
 - `stop()`
 
   关闭选中的视频窗口
 
-
-
 ### 事件
 
-无
+- `timeout` 超时事件
 
+  当连接上flv服务器后，一定时间内没有收到数据流，触发超时
 
+  当重连失败后，触发超时
+
+  ```vue
+  <v3d-monitor
+    ref="refMonitor"
+    @timeout="doTimeout"
+  >
+  
+  // 参数类型：当前播放器 Player 对象
+  const doTimeout = (player: Player) => {
+    console.log(player.getOptions())
+  }
+  ```
+
+  
 
 ### 插槽
 
 > 整体布局插槽
 >
-> `ready`  待机状态下的界面
+> `ready` 待机状态下的界面
 >
 > ```vue
 > <v3d-monitor>
@@ -319,8 +303,6 @@ onMounted(() => {
 >   </template>
 > </v3d-monitor>
 > ```
-
-
 
 > 与皮肤结合的局部插槽
 >
@@ -352,25 +334,22 @@ onMounted(() => {
 > </v3d-monitor>
 > ```
 
-
-
-
 ## 项目
 
 setup
 
-``` bash
+```bash
 npm i
 ```
 
 dev
 
-``` bash
+```bash
 npm run dev
 ```
 
 build
 
-``` bash
+```bash
 npm run build
 ```
