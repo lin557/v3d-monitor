@@ -7,6 +7,7 @@
         :ref="setPlayerRef"
         :border="item.border"
         :index="index"
+        :lang="props.lang"
         :controls="props.lockControls"
         :screenshot="props.screenshot"
         :fullscreen="props.fullscreen"
@@ -14,7 +15,9 @@
         :timeout="props.timeout"
         @timeout="doTimeout"
         @loadeddata="doLoadeddata(index)"
+        @position="doPosition($event, index)"
         @click="doClick(index)"
+        @error="doError(index)"
         @dblclick.stop.prevent="doDbClick(index)"
       >
         <template v-slot:ready>
@@ -61,6 +64,12 @@
               </template>
             </template>
           </template>
+        </template>
+        <template v-slot:error>
+          <v3d-default-error @refresh="doRefresh(index)">
+            <template v-slot:message> {{ item.error }} </template>
+            <template v-slot:refresh> {{ item.refresh }} </template>
+          </v3d-default-error>
         </template>
       </v3d-player>
     </div>
@@ -139,14 +148,15 @@ import {
   V3dLoading
 } from '../../d.ts'
 import V3dDefaultReady from './themes/v3d-default-ready.vue'
-import v3dDefaultLoading from './themes/v3d-default-loading.vue'
+import V3dDefaultLoading from './themes/v3d-default-loading.vue'
+import V3dDefaultError from './themes/v3d-default-error.vue'
 // 插槽
 const slots = useSlots()
 const refView = ref()
 type Player = typeof V3dPlayer
 let refPlayers: Array<Player> = []
 
-const emits = defineEmits(['timeout', 'loadeddata'])
+const emits = defineEmits(['timeout', 'loadeddata', 'refresh', 'position'])
 
 type MergeObject = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -181,6 +191,11 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  // 关闭时间 毫秒
+  closeTime: {
+    type: Number,
+    default: 0
+  },
   controlBar: {
     type: [Object, Boolean],
     default: true
@@ -198,15 +213,15 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  // 关闭时间 毫秒
-  closeTime: {
-    type: Number,
-    default: 0
+  fullscreen: {
+    type: Boolean,
+    default: true
   },
-  // 超时时间 毫秒
-  timeout: {
-    type: Number,
-    default: 10000
+  lang: {
+    type: String,
+    default() {
+      return navigator.language.toLowerCase()
+    }
   },
   /**
    * 常驻工具栏
@@ -215,18 +230,19 @@ const props = defineProps({
     type: String,
     default: 'auto'
   },
-  screenshot: {
-    type: Boolean,
-    default: true
-  },
-  fullscreen: {
-    type: Boolean,
-    default: true
-  },
   // 循环创建 不管其他窗口是否打开 关掉最先打开的窗口 并播放新的视频
   loopCreate: {
     type: Boolean,
     default: true
+  },
+  screenshot: {
+    type: Boolean,
+    default: true
+  },
+  // 超时时间 毫秒
+  timeout: {
+    type: Number,
+    default: 10000
   },
   theme: {
     type: String,
@@ -243,9 +259,13 @@ interface VideoParam {
   id: number
   cls: string
   border: boolean
+  error: string
+  refresh: string
   title?: string
   detail?: string
   loading?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  userData?: any | undefined
 }
 
 interface Data {
@@ -386,7 +406,7 @@ const apply = (param: V3dApplyParam) => {
       // 存在时关闭旧的
       player.close()
       updateLoad(player.index(), param.load)
-      player.occupy(newOrder(), param.unique, param.title)
+      player.occupy(newOrder(), param.unique, param.title, param.userData)
       setSelected(player)
       return player.index()
     }
@@ -416,7 +436,7 @@ const apply = (param: V3dApplyParam) => {
   if (player) {
     // 有可用窗口 占用
     updateLoad(player.index(), param.load)
-    player.occupy(newOrder(), param.unique, param.title)
+    player.occupy(newOrder(), param.unique, param.title, param.userData)
     setSelected(player)
     return player.index()
   }
@@ -428,7 +448,7 @@ const apply = (param: V3dApplyParam) => {
       // 存在时关闭旧的
       player.close()
       updateLoad(player.index(), param.load)
-      player.occupy(newOrder(), param.unique, param.title)
+      player.occupy(newOrder(), param.unique, param.title, param.userData)
       setSelected(player)
       return player.index()
     }
@@ -513,6 +533,8 @@ const createView = () => {
       self.videos.push({
         id: i,
         cls: calcCls(i),
+        error: '',
+        refresh: 'Refresh',
         border: true,
         title: 'DIGITAL VIDEO',
         detail: '',
@@ -541,14 +563,37 @@ const doDbClick = (index: number) => {
   }
 }
 
+const updatePlayer = (index: number) => {
+  const player = getPlayerById(index)
+  self.videos[index].error = player.message()
+  self.videos[index].refresh = player.locale('refresh')
+  return player
+}
+
+const doError = (index: number) => {
+  updatePlayer(index)
+}
+
 const doLoadeddata = (index: number) => {
   const player = getPlayerById(index)
   emits('loadeddata', player)
 }
 
-const doTimeout = (index: number) => {
+const doPosition = (position: number, index: number) => {
   const player = getPlayerById(index)
-  emits('timeout', player)
+  emits('position', player, position)
+}
+
+const doRefresh = (index: number) => {
+  const player = getPlayerById(index)
+  emits('refresh', player)
+}
+
+const doTimeout = (index: number) => {
+  const player = updatePlayer(index)
+  if (player) {
+    emits('timeout', player)
+  }
 }
 
 /**
@@ -686,7 +731,9 @@ const handleOptions = (opts: V3dMonitorOptions) => {
     title: opts.title,
     unique: unique,
     volume: 1.0,
-    userData: opts.userData
+    userData: opts.userData,
+    duration: opts.duration,
+    startTime: opts.startTime
   }
 }
 
@@ -787,6 +834,8 @@ const error = (index: number | Player, msg: string) => {
   if (player) {
     if (player.status() > 0) {
       player.error(msg)
+      self.videos[player.index()].error = player.message()
+      self.videos[player.index()].refresh = player.locale('refresh')
     }
   }
 }
@@ -1100,7 +1149,7 @@ $controlColor: #202020;
 
     .v3d-player {
       float: left;
-      font-size: 12px;
+      font-size: 14px;
       user-select: none;
     }
 
@@ -1476,7 +1525,7 @@ $controlColor: #202020;
 
   &.v3m-theme-blue {
     .v3d-player .v3d-focus {
-      border-color: #1d2088;
+      border-color: #409eff;
     }
   }
 }

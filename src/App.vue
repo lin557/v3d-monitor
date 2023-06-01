@@ -2,16 +2,20 @@
   <div class="demo">
     <v3d-monitor
       ref="refMonitor"
+      class="v3m-theme-blue"
       :count="count"
       :lock-controls="lockControls"
       :timeout="3000"
+      lang="en"
       :duplicate="false"
       :control-bar="controlBar"
       :close-time="closeTime"
       :fullscreen="fullscreen"
       :screenshot="screenshot"
       @timeout="doTimeout"
+      @refresh="doRefresh"
       @loadeddata="doLoadedData"
+      @position="doPosition"
     >
       <!-- <template v-slot:ready>
         <div>abc</div>
@@ -218,7 +222,7 @@ const controlBar = ref({
 const lockControls = ref('auto')
 
 const count = ref(9)
-const closeTime = ref(13000)
+const closeTime = ref(300000)
 const screenshot = ref(true)
 const fullscreen = ref(true)
 
@@ -234,6 +238,10 @@ const apply = () => {
       title: '蒙H12388D',
       detail: 'CH1 高清',
       loading: '视频加载中'
+    },
+    userData: {
+      t: 1,
+      a: 2
     }
   })
 
@@ -244,8 +252,16 @@ const doLoadedData = (player: Player) => {
   console.log('doLoadedData', player.order())
 }
 
+const doPosition = (player: Player, position: number) => {
+  console.log('doPosition', player, position)
+}
+
 const doTimeout = (player: Player) => {
   console.log(player.getOptions())
+}
+
+const doRefresh = (player: Player) => {
+  console.log(player.userData())
 }
 
 const toggleShot = () => {
@@ -272,7 +288,6 @@ const play = (index: number) => {
       // src: 'https://www.transcodegroup.cn/test/h264.flv',
       src: '//d2zihajmogu5jn.cloudfront.net/bipbop-advanced/gear3/prog_index.m3u8',
       // viewIndex: 1,
-      allowPause: true,
       contextmenu: [
         {
           text: 'custom1',
@@ -289,7 +304,9 @@ const play = (index: number) => {
       userData: {
         test1: '1',
         test2: '2'
-      }
+      },
+      startTime: 0,
+      duration: 3000
     },
     {
       title: 'oceans.mp4',
@@ -298,22 +315,29 @@ const play = (index: number) => {
         title: '蒙H12388D',
         detail: 'CH1 高清',
         loading: '视频加载中'
-      }
+      },
+      startTime: 0,
+      duration: 3000
     },
     {
-      allowPause: true,
       loadText: '蒙H12388D CH1 高清',
       title: '蒙H12388D CH1',
-      src: 'https://dno-xiu-hd.youku.com/lfgame/cmcu_alias_3567125494_8148028.flv?auth_key=1713350365-0-0-6e1ba74b2a57fce3d97f46c991074a23',
+      src: 'https://dno-xiu-hd.youku.com/lfgame/cmcu_alias_3597860654_8150038.flv?auth_key=1717121978-0-0-c86bc1d8c451422edfcb1776a5c33aab',
+      userData: {
+        test1: '1',
+        test2: '2'
+      },
+      startTime: 0,
+      duration: 3000
+    },
+    {
+      title: '浙江卫视',
+      src: 'https://xn.transcodegroup.cn:8587/mdvr/live/8998_1.flv',
+      //src: 'http://hw-vl.cztv.com/channels/lantian/channel01/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=d0c0b9d2821a784c8527a7892b0555bf&t=1680572871'
       userData: {
         test1: '1',
         test2: '2'
       }
-    },
-    {
-      allowPause: true,
-      title: '浙江卫视',
-      src: 'http://hw-vl.cztv.com/channels/lantian/channel01/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=d0c0b9d2821a784c8527a7892b0555bf&t=1680572871'
     }
   ]
 

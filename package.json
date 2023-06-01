@@ -1,13 +1,13 @@
 {
   "name": "v3d-monitor",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "description": "Vue3 Multi-window video player",
   "main": "dist/v3d-monitor.umd.js",
   "module": "dist/v3d-monitor.es.js",
   "types": "d.ts/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "dts": "vue-tsc --declaration --emitDeclarationOnly",
+    "dts": "vue-tsc --declaration --emitDeclarationOnly && rimraf ./src/App.vue.d.ts && rimraf ./src/main.d.ts && rimraf ./src/components/themes/*.d.ts",
     "lint": "eslint src --fix --ext .ts,.tsx,.vue,.js,.jsx",
     "prettier": "prettier --write .",
     "build": "vue-tsc --noEmit && vite build",
@@ -40,7 +40,7 @@
   "author": "lin557",
   "license": "MIT",
   "dependencies": {
-    "v3d-player": "^1.2.2",
+    "v3d-player": "^1.3.2",
     "vue": "^3.2.47"
   },
   "devDependencies": {

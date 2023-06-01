@@ -6,7 +6,7 @@ export type Player = typeof V3dPlayer
 
 export { V3dDisplay } from 'v3d-player'
 
-export type V3dMonitorEvents = 'timeout' | 'loadeddata'
+export type V3dMonitorEvents = 'timeout' | 'loadeddata' | 'refresh' | 'position'
 
 export interface V3dControlBar {
   enabled: boolean
@@ -19,6 +19,7 @@ export interface V3dApplyParam {
   unique: string
   title: string
   load?: V3dLoading | undefined
+  userData?: any | undefined
 }
 
 export interface DPlayerContextMenuItem {
@@ -44,6 +45,8 @@ export interface V3dMonitorOptions {
   unique?: string | undefined
   viewIndex?: number | undefined
   userData?: any | undefined
+  duration?: number | undefined
+  startTime?: number | undefined
 }
 
 type __VLS_WithTemplateSlots<T, S> = T & {
@@ -58,6 +61,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
       closeAfterViewChange: {
         type: BooleanConstructor
         default: boolean
+      }
+      closeTime: {
+        type: NumberConstructor
+        default: number
       }
       controlBar: {
         type: (BooleanConstructor | ObjectConstructor)[]
@@ -75,13 +82,13 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         type: BooleanConstructor
         default: boolean
       }
-      closeTime: {
-        type: NumberConstructor
-        default: number
+      fullscreen: {
+        type: BooleanConstructor
+        default: boolean
       }
-      timeout: {
-        type: NumberConstructor
-        default: number
+      lang: {
+        type: StringConstructor
+        default(): string
       }
       /**
        * 常驻工具栏
@@ -90,17 +97,17 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         type: StringConstructor
         default: string
       }
+      loopCreate: {
+        type: BooleanConstructor
+        default: boolean
+      }
       screenshot: {
         type: BooleanConstructor
         default: boolean
       }
-      fullscreen: {
-        type: BooleanConstructor
-        default: boolean
-      }
-      loopCreate: {
-        type: BooleanConstructor
-        default: boolean
+      timeout: {
+        type: NumberConstructor
+        default: number
       }
       theme: {
         type: StringConstructor
@@ -122,20 +129,29 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 timeout: number
                 screenshot: boolean
                 fullscreen: boolean
+                allowPause: boolean
                 border: boolean
                 index: number
                 controls: string
+                lang: string
                 options: Record<string, any>
                 poster: string
               }> &
                 Omit<
                   Readonly<
                     import('vue').ExtractPropTypes<{
+                      allowPause: {
+                        type: BooleanConstructor
+                        default: boolean
+                      }
                       border: {
                         type: BooleanConstructor
                         default: boolean
                       }
                       fill: {
+                        /**
+                         * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                         */
                         type: BooleanConstructor
                         default: boolean
                       }
@@ -144,6 +160,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         default: number
                       }
                       controls: {
+                        type: StringConstructor
+                        default: string
+                      }
+                      lang: {
                         type: StringConstructor
                         default: string
                       }
@@ -158,7 +178,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       options: {
                         type: ObjectConstructor
                         default(): {
-                          allowPause: boolean
                           autoplay: boolean
                           controls: boolean
                           contextmenu: never[]
@@ -206,6 +225,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     onTimeupdate?: ((...args: any[]) => any) | undefined
                     onVolumechange?: ((...args: any[]) => any) | undefined
                     onWaiting?: ((...args: any[]) => any) | undefined
+                    onPosition?: ((...args: any[]) => any) | undefined
                     onReady?: ((...args: any[]) => any) | undefined
                     onFetch_start?: ((...args: any[]) => any) | undefined
                     onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -227,8 +247,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     import('vue').ComponentCustomProps,
                   | 'fill'
                   | 'timeout'
-                  | 'screenshot'
                   | 'fullscreen'
+                  | 'lang'
+                  | 'screenshot'
+                  | 'allowPause'
                   | 'border'
                   | 'index'
                   | 'controls'
@@ -305,8 +327,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'progress'
                   | 'timeout'
                   | 'loadeddata'
-                  | 'screenshot'
+                  | 'position'
                   | 'fullscreen'
+                  | 'screenshot'
                   | 'play'
                   | 'ready'
                   | 'timeupdate'
@@ -346,11 +369,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               $options: import('vue').ComponentOptionsBase<
                 Readonly<
                   import('vue').ExtractPropTypes<{
+                    allowPause: {
+                      type: BooleanConstructor
+                      default: boolean
+                    }
                     border: {
                       type: BooleanConstructor
                       default: boolean
                     }
                     fill: {
+                      /**
+                       * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                       */
                       type: BooleanConstructor
                       default: boolean
                     }
@@ -359,6 +389,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       default: number
                     }
                     controls: {
+                      type: StringConstructor
+                      default: string
+                    }
+                    lang: {
                       type: StringConstructor
                       default: string
                     }
@@ -373,7 +407,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     options: {
                       type: ObjectConstructor
                       default(): {
-                        allowPause: boolean
                         autoplay: boolean
                         controls: boolean
                         contextmenu: never[]
@@ -421,6 +454,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   onTimeupdate?: ((...args: any[]) => any) | undefined
                   onVolumechange?: ((...args: any[]) => any) | undefined
                   onWaiting?: ((...args: any[]) => any) | undefined
+                  onPosition?: ((...args: any[]) => any) | undefined
                   onReady?: ((...args: any[]) => any) | undefined
                   onFetch_start?: ((...args: any[]) => any) | undefined
                   onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -444,7 +478,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   currentTime: () => number
                   currentUrl: () => string
                   el: () => any
-                  error: (text: string) => void
+                  error: (msg: string) => void
                   focused: (focus?: boolean | undefined) => boolean | undefined
                   getOptions: () =>
                     | {
@@ -502,17 +536,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                           | undefined
                         volume?: number | undefined
                         unique?: string | undefined
+                        userData?: any
+                        duration?: number | undefined
+                        startTime?: number | undefined
                       }
                     | undefined
                   index: () => number
+                  locale: (key: string) => any
+                  message: () => string
                   muted: () => void
-                  occupy: (order: number, unique: string, text: string) => void
+                  occupy: (
+                    order: number,
+                    unique: string,
+                    text: string,
+                    userData: any
+                  ) => void
                   order: () => number
                   pause: () => void
                   play: (
                     option: import('v3d-player').V3dPlayerOptions | undefined
                   ) => void
                   playRate: (rate: number) => number
+                  position: () => number
                   seek: (time: number) => void
                   snapshot: () => void
                   status: () => number
@@ -524,6 +569,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     nonotice?: boolean | undefined
                   ) => number
                   unique: () => string | undefined
+                  userData: () => any
                 },
                 unknown,
                 {},
@@ -534,8 +580,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'progress'
                   | 'timeout'
                   | 'loadeddata'
-                  | 'screenshot'
+                  | 'position'
                   | 'fullscreen'
+                  | 'screenshot'
                   | 'play'
                   | 'ready'
                   | 'timeupdate'
@@ -576,9 +623,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   timeout: number
                   screenshot: boolean
                   fullscreen: boolean
+                  allowPause: boolean
                   border: boolean
                   index: number
                   controls: string
+                  lang: string
                   options: Record<string, any>
                   poster: string
                 },
@@ -689,11 +738,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               ): import('vue').WatchStopHandle
             } & Readonly<
               import('vue').ExtractPropTypes<{
+                allowPause: {
+                  type: BooleanConstructor
+                  default: boolean
+                }
                 border: {
                   type: BooleanConstructor
                   default: boolean
                 }
                 fill: {
+                  /**
+                   * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                   */
                   type: BooleanConstructor
                   default: boolean
                 }
@@ -702,6 +758,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   default: number
                 }
                 controls: {
+                  type: StringConstructor
+                  default: string
+                }
+                lang: {
                   type: StringConstructor
                   default: string
                 }
@@ -716,7 +776,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 options: {
                   type: ObjectConstructor
                   default(): {
-                    allowPause: boolean
                     autoplay: boolean
                     controls: boolean
                     contextmenu: never[]
@@ -764,6 +823,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 onTimeupdate?: ((...args: any[]) => any) | undefined
                 onVolumechange?: ((...args: any[]) => any) | undefined
                 onWaiting?: ((...args: any[]) => any) | undefined
+                onPosition?: ((...args: any[]) => any) | undefined
                 onReady?: ((...args: any[]) => any) | undefined
                 onFetch_start?: ((...args: any[]) => any) | undefined
                 onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -786,7 +846,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 currentTime: () => number
                 currentUrl: () => string
                 el: () => any
-                error: (text: string) => void
+                error: (msg: string) => void
                 focused: (focus?: boolean | undefined) => boolean | undefined
                 getOptions: () =>
                   | {
@@ -844,17 +904,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         | undefined
                       volume?: number | undefined
                       unique?: string | undefined
+                      userData?: any
+                      duration?: number | undefined
+                      startTime?: number | undefined
                     }
                   | undefined
                 index: () => number
+                locale: (key: string) => any
+                message: () => string
                 muted: () => void
-                occupy: (order: number, unique: string, text: string) => void
+                occupy: (
+                  order: number,
+                  unique: string,
+                  text: string,
+                  userData: any
+                ) => void
                 order: () => number
                 pause: () => void
                 play: (
                   option: import('v3d-player').V3dPlayerOptions | undefined
                 ) => void
                 playRate: (rate: number) => number
+                position: () => number
                 seek: (time: number) => void
                 snapshot: () => void
                 status: () => number
@@ -866,6 +937,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   nonotice?: boolean | undefined
                 ) => number
                 unique: () => string | undefined
+                userData: () => any
               }> & {} & import('vue').ComponentCustomProperties & {}
             __isFragment?: undefined
             __isTeleport?: undefined
@@ -873,11 +945,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           } & import('vue').ComponentOptionsBase<
             Readonly<
               import('vue').ExtractPropTypes<{
+                allowPause: {
+                  type: BooleanConstructor
+                  default: boolean
+                }
                 border: {
                   type: BooleanConstructor
                   default: boolean
                 }
                 fill: {
+                  /**
+                   * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                   */
                   type: BooleanConstructor
                   default: boolean
                 }
@@ -886,6 +965,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   default: number
                 }
                 controls: {
+                  type: StringConstructor
+                  default: string
+                }
+                lang: {
                   type: StringConstructor
                   default: string
                 }
@@ -900,7 +983,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 options: {
                   type: ObjectConstructor
                   default(): {
-                    allowPause: boolean
                     autoplay: boolean
                     controls: boolean
                     contextmenu: never[]
@@ -948,6 +1030,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               onTimeupdate?: ((...args: any[]) => any) | undefined
               onVolumechange?: ((...args: any[]) => any) | undefined
               onWaiting?: ((...args: any[]) => any) | undefined
+              onPosition?: ((...args: any[]) => any) | undefined
               onReady?: ((...args: any[]) => any) | undefined
               onFetch_start?: ((...args: any[]) => any) | undefined
               onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -971,7 +1054,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               currentTime: () => number
               currentUrl: () => string
               el: () => any
-              error: (text: string) => void
+              error: (msg: string) => void
               focused: (focus?: boolean | undefined) => boolean | undefined
               getOptions: () =>
                 | {
@@ -1029,17 +1112,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       | undefined
                     volume?: number | undefined
                     unique?: string | undefined
+                    userData?: any
+                    duration?: number | undefined
+                    startTime?: number | undefined
                   }
                 | undefined
               index: () => number
+              locale: (key: string) => any
+              message: () => string
               muted: () => void
-              occupy: (order: number, unique: string, text: string) => void
+              occupy: (
+                order: number,
+                unique: string,
+                text: string,
+                userData: any
+              ) => void
               order: () => number
               pause: () => void
               play: (
                 option: import('v3d-player').V3dPlayerOptions | undefined
               ) => void
               playRate: (rate: number) => number
+              position: () => number
               seek: (time: number) => void
               snapshot: () => void
               status: () => number
@@ -1051,6 +1145,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 nonotice?: boolean | undefined
               ) => number
               unique: () => string | undefined
+              userData: () => any
             },
             unknown,
             {},
@@ -1061,8 +1156,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'progress'
               | 'timeout'
               | 'loadeddata'
-              | 'screenshot'
+              | 'position'
               | 'fullscreen'
+              | 'screenshot'
               | 'play'
               | 'ready'
               | 'timeupdate'
@@ -1100,8 +1196,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             | 'progress'
             | 'timeout'
             | 'loadeddata'
-            | 'screenshot'
+            | 'position'
             | 'fullscreen'
+            | 'screenshot'
             | 'play'
             | 'ready'
             | 'timeupdate'
@@ -1140,9 +1237,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               timeout: number
               screenshot: boolean
               fullscreen: boolean
+              allowPause: boolean
               border: boolean
               index: number
               controls: string
+              lang: string
               options: Record<string, any>
               poster: string
             },
@@ -1156,6 +1255,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               $slots: {
                 ready: (_: {}) => any
                 loading: (_: {}) => any
+                error: (_: {}) => any
               }
             }))
         | null
@@ -1169,20 +1269,29 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 timeout: number
                 screenshot: boolean
                 fullscreen: boolean
+                allowPause: boolean
                 border: boolean
                 index: number
                 controls: string
+                lang: string
                 options: Record<string, any>
                 poster: string
               }> &
                 Omit<
                   Readonly<
                     import('vue').ExtractPropTypes<{
+                      allowPause: {
+                        type: BooleanConstructor
+                        default: boolean
+                      }
                       border: {
                         type: BooleanConstructor
                         default: boolean
                       }
                       fill: {
+                        /**
+                         * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                         */
                         type: BooleanConstructor
                         default: boolean
                       }
@@ -1191,6 +1300,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         default: number
                       }
                       controls: {
+                        type: StringConstructor
+                        default: string
+                      }
+                      lang: {
                         type: StringConstructor
                         default: string
                       }
@@ -1205,7 +1318,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       options: {
                         type: ObjectConstructor
                         default(): {
-                          allowPause: boolean
                           autoplay: boolean
                           controls: boolean
                           contextmenu: never[]
@@ -1253,6 +1365,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     onTimeupdate?: ((...args: any[]) => any) | undefined
                     onVolumechange?: ((...args: any[]) => any) | undefined
                     onWaiting?: ((...args: any[]) => any) | undefined
+                    onPosition?: ((...args: any[]) => any) | undefined
                     onReady?: ((...args: any[]) => any) | undefined
                     onFetch_start?: ((...args: any[]) => any) | undefined
                     onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -1274,8 +1387,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     import('vue').ComponentCustomProps,
                   | 'fill'
                   | 'timeout'
-                  | 'screenshot'
                   | 'fullscreen'
+                  | 'lang'
+                  | 'screenshot'
+                  | 'allowPause'
                   | 'border'
                   | 'index'
                   | 'controls'
@@ -1352,8 +1467,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'progress'
                   | 'timeout'
                   | 'loadeddata'
-                  | 'screenshot'
+                  | 'position'
                   | 'fullscreen'
+                  | 'screenshot'
                   | 'play'
                   | 'ready'
                   | 'timeupdate'
@@ -1393,11 +1509,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               $options: import('vue').ComponentOptionsBase<
                 Readonly<
                   import('vue').ExtractPropTypes<{
+                    allowPause: {
+                      type: BooleanConstructor
+                      default: boolean
+                    }
                     border: {
                       type: BooleanConstructor
                       default: boolean
                     }
                     fill: {
+                      /**
+                       * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                       */
                       type: BooleanConstructor
                       default: boolean
                     }
@@ -1406,6 +1529,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       default: number
                     }
                     controls: {
+                      type: StringConstructor
+                      default: string
+                    }
+                    lang: {
                       type: StringConstructor
                       default: string
                     }
@@ -1420,7 +1547,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     options: {
                       type: ObjectConstructor
                       default(): {
-                        allowPause: boolean
                         autoplay: boolean
                         controls: boolean
                         contextmenu: never[]
@@ -1468,6 +1594,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   onTimeupdate?: ((...args: any[]) => any) | undefined
                   onVolumechange?: ((...args: any[]) => any) | undefined
                   onWaiting?: ((...args: any[]) => any) | undefined
+                  onPosition?: ((...args: any[]) => any) | undefined
                   onReady?: ((...args: any[]) => any) | undefined
                   onFetch_start?: ((...args: any[]) => any) | undefined
                   onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -1491,7 +1618,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   currentTime: () => number
                   currentUrl: () => string
                   el: () => any
-                  error: (text: string) => void
+                  error: (msg: string) => void
                   focused: (focus?: boolean | undefined) => boolean | undefined
                   getOptions: () =>
                     | {
@@ -1549,17 +1676,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                           | undefined
                         volume?: number | undefined
                         unique?: string | undefined
+                        userData?: any
+                        duration?: number | undefined
+                        startTime?: number | undefined
                       }
                     | undefined
                   index: () => number
+                  locale: (key: string) => any
+                  message: () => string
                   muted: () => void
-                  occupy: (order: number, unique: string, text: string) => void
+                  occupy: (
+                    order: number,
+                    unique: string,
+                    text: string,
+                    userData: any
+                  ) => void
                   order: () => number
                   pause: () => void
                   play: (
                     option: import('v3d-player').V3dPlayerOptions | undefined
                   ) => void
                   playRate: (rate: number) => number
+                  position: () => number
                   seek: (time: number) => void
                   snapshot: () => void
                   status: () => number
@@ -1571,6 +1709,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     nonotice?: boolean | undefined
                   ) => number
                   unique: () => string | undefined
+                  userData: () => any
                 },
                 unknown,
                 {},
@@ -1581,8 +1720,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'progress'
                   | 'timeout'
                   | 'loadeddata'
-                  | 'screenshot'
+                  | 'position'
                   | 'fullscreen'
+                  | 'screenshot'
                   | 'play'
                   | 'ready'
                   | 'timeupdate'
@@ -1623,9 +1763,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   timeout: number
                   screenshot: boolean
                   fullscreen: boolean
+                  allowPause: boolean
                   border: boolean
                   index: number
                   controls: string
+                  lang: string
                   options: Record<string, any>
                   poster: string
                 },
@@ -1736,11 +1878,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               ): import('vue').WatchStopHandle
             } & Readonly<
               import('vue').ExtractPropTypes<{
+                allowPause: {
+                  type: BooleanConstructor
+                  default: boolean
+                }
                 border: {
                   type: BooleanConstructor
                   default: boolean
                 }
                 fill: {
+                  /**
+                   * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                   */
                   type: BooleanConstructor
                   default: boolean
                 }
@@ -1749,6 +1898,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   default: number
                 }
                 controls: {
+                  type: StringConstructor
+                  default: string
+                }
+                lang: {
                   type: StringConstructor
                   default: string
                 }
@@ -1763,7 +1916,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 options: {
                   type: ObjectConstructor
                   default(): {
-                    allowPause: boolean
                     autoplay: boolean
                     controls: boolean
                     contextmenu: never[]
@@ -1811,6 +1963,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 onTimeupdate?: ((...args: any[]) => any) | undefined
                 onVolumechange?: ((...args: any[]) => any) | undefined
                 onWaiting?: ((...args: any[]) => any) | undefined
+                onPosition?: ((...args: any[]) => any) | undefined
                 onReady?: ((...args: any[]) => any) | undefined
                 onFetch_start?: ((...args: any[]) => any) | undefined
                 onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -1833,7 +1986,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 currentTime: () => number
                 currentUrl: () => string
                 el: () => any
-                error: (text: string) => void
+                error: (msg: string) => void
                 focused: (focus?: boolean | undefined) => boolean | undefined
                 getOptions: () =>
                   | {
@@ -1891,17 +2044,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         | undefined
                       volume?: number | undefined
                       unique?: string | undefined
+                      userData?: any
+                      duration?: number | undefined
+                      startTime?: number | undefined
                     }
                   | undefined
                 index: () => number
+                locale: (key: string) => any
+                message: () => string
                 muted: () => void
-                occupy: (order: number, unique: string, text: string) => void
+                occupy: (
+                  order: number,
+                  unique: string,
+                  text: string,
+                  userData: any
+                ) => void
                 order: () => number
                 pause: () => void
                 play: (
                   option: import('v3d-player').V3dPlayerOptions | undefined
                 ) => void
                 playRate: (rate: number) => number
+                position: () => number
                 seek: (time: number) => void
                 snapshot: () => void
                 status: () => number
@@ -1913,6 +2077,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   nonotice?: boolean | undefined
                 ) => number
                 unique: () => string | undefined
+                userData: () => any
               }> & {} & import('vue').ComponentCustomProperties & {}
             __isFragment?: undefined
             __isTeleport?: undefined
@@ -1920,11 +2085,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           } & import('vue').ComponentOptionsBase<
             Readonly<
               import('vue').ExtractPropTypes<{
+                allowPause: {
+                  type: BooleanConstructor
+                  default: boolean
+                }
                 border: {
                   type: BooleanConstructor
                   default: boolean
                 }
                 fill: {
+                  /**
+                   * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                   */
                   type: BooleanConstructor
                   default: boolean
                 }
@@ -1933,6 +2105,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   default: number
                 }
                 controls: {
+                  type: StringConstructor
+                  default: string
+                }
+                lang: {
                   type: StringConstructor
                   default: string
                 }
@@ -1947,7 +2123,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 options: {
                   type: ObjectConstructor
                   default(): {
-                    allowPause: boolean
                     autoplay: boolean
                     controls: boolean
                     contextmenu: never[]
@@ -1995,6 +2170,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               onTimeupdate?: ((...args: any[]) => any) | undefined
               onVolumechange?: ((...args: any[]) => any) | undefined
               onWaiting?: ((...args: any[]) => any) | undefined
+              onPosition?: ((...args: any[]) => any) | undefined
               onReady?: ((...args: any[]) => any) | undefined
               onFetch_start?: ((...args: any[]) => any) | undefined
               onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -2018,7 +2194,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               currentTime: () => number
               currentUrl: () => string
               el: () => any
-              error: (text: string) => void
+              error: (msg: string) => void
               focused: (focus?: boolean | undefined) => boolean | undefined
               getOptions: () =>
                 | {
@@ -2076,17 +2252,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       | undefined
                     volume?: number | undefined
                     unique?: string | undefined
+                    userData?: any
+                    duration?: number | undefined
+                    startTime?: number | undefined
                   }
                 | undefined
               index: () => number
+              locale: (key: string) => any
+              message: () => string
               muted: () => void
-              occupy: (order: number, unique: string, text: string) => void
+              occupy: (
+                order: number,
+                unique: string,
+                text: string,
+                userData: any
+              ) => void
               order: () => number
               pause: () => void
               play: (
                 option: import('v3d-player').V3dPlayerOptions | undefined
               ) => void
               playRate: (rate: number) => number
+              position: () => number
               seek: (time: number) => void
               snapshot: () => void
               status: () => number
@@ -2098,6 +2285,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 nonotice?: boolean | undefined
               ) => number
               unique: () => string | undefined
+              userData: () => any
             },
             unknown,
             {},
@@ -2108,8 +2296,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'progress'
               | 'timeout'
               | 'loadeddata'
-              | 'screenshot'
+              | 'position'
               | 'fullscreen'
+              | 'screenshot'
               | 'play'
               | 'ready'
               | 'timeupdate'
@@ -2147,8 +2336,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             | 'progress'
             | 'timeout'
             | 'loadeddata'
-            | 'screenshot'
+            | 'position'
             | 'fullscreen'
+            | 'screenshot'
             | 'play'
             | 'ready'
             | 'timeupdate'
@@ -2187,9 +2377,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               timeout: number
               screenshot: boolean
               fullscreen: boolean
+              allowPause: boolean
               border: boolean
               index: number
               controls: string
+              lang: string
               options: Record<string, any>
               poster: string
             },
@@ -2203,6 +2395,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               $slots: {
                 ready: (_: {}) => any
                 loading: (_: {}) => any
+                error: (_: {}) => any
               }
             }))
         | undefined
@@ -2217,20 +2410,29 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             timeout: number
             screenshot: boolean
             fullscreen: boolean
+            allowPause: boolean
             border: boolean
             index: number
             controls: string
+            lang: string
             options: Record<string, any>
             poster: string
           }> &
             Omit<
               Readonly<
                 import('vue').ExtractPropTypes<{
+                  allowPause: {
+                    type: BooleanConstructor
+                    default: boolean
+                  }
                   border: {
                     type: BooleanConstructor
                     default: boolean
                   }
                   fill: {
+                    /**
+                     * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                     */
                     type: BooleanConstructor
                     default: boolean
                   }
@@ -2239,6 +2441,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     default: number
                   }
                   controls: {
+                    type: StringConstructor
+                    default: string
+                  }
+                  lang: {
                     type: StringConstructor
                     default: string
                   }
@@ -2253,7 +2459,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   options: {
                     type: ObjectConstructor
                     default(): {
-                      allowPause: boolean
                       autoplay: boolean
                       controls: boolean
                       contextmenu: never[]
@@ -2301,6 +2506,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 onTimeupdate?: ((...args: any[]) => any) | undefined
                 onVolumechange?: ((...args: any[]) => any) | undefined
                 onWaiting?: ((...args: any[]) => any) | undefined
+                onPosition?: ((...args: any[]) => any) | undefined
                 onReady?: ((...args: any[]) => any) | undefined
                 onFetch_start?: ((...args: any[]) => any) | undefined
                 onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -2322,8 +2528,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 import('vue').ComponentCustomProps,
               | 'fill'
               | 'timeout'
-              | 'screenshot'
               | 'fullscreen'
+              | 'lang'
+              | 'screenshot'
+              | 'allowPause'
               | 'border'
               | 'index'
               | 'controls'
@@ -2400,8 +2608,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'progress'
               | 'timeout'
               | 'loadeddata'
-              | 'screenshot'
+              | 'position'
               | 'fullscreen'
+              | 'screenshot'
               | 'play'
               | 'ready'
               | 'timeupdate'
@@ -2441,11 +2650,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           $options: import('vue').ComponentOptionsBase<
             Readonly<
               import('vue').ExtractPropTypes<{
+                allowPause: {
+                  type: BooleanConstructor
+                  default: boolean
+                }
                 border: {
                   type: BooleanConstructor
                   default: boolean
                 }
                 fill: {
+                  /**
+                   * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                   */
                   type: BooleanConstructor
                   default: boolean
                 }
@@ -2454,6 +2670,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   default: number
                 }
                 controls: {
+                  type: StringConstructor
+                  default: string
+                }
+                lang: {
                   type: StringConstructor
                   default: string
                 }
@@ -2468,7 +2688,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 options: {
                   type: ObjectConstructor
                   default(): {
-                    allowPause: boolean
                     autoplay: boolean
                     controls: boolean
                     contextmenu: never[]
@@ -2516,6 +2735,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               onTimeupdate?: ((...args: any[]) => any) | undefined
               onVolumechange?: ((...args: any[]) => any) | undefined
               onWaiting?: ((...args: any[]) => any) | undefined
+              onPosition?: ((...args: any[]) => any) | undefined
               onReady?: ((...args: any[]) => any) | undefined
               onFetch_start?: ((...args: any[]) => any) | undefined
               onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -2539,7 +2759,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               currentTime: () => number
               currentUrl: () => string
               el: () => any
-              error: (text: string) => void
+              error: (msg: string) => void
               focused: (focus?: boolean | undefined) => boolean | undefined
               getOptions: () =>
                 | {
@@ -2597,17 +2817,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       | undefined
                     volume?: number | undefined
                     unique?: string | undefined
+                    userData?: any
+                    duration?: number | undefined
+                    startTime?: number | undefined
                   }
                 | undefined
               index: () => number
+              locale: (key: string) => any
+              message: () => string
               muted: () => void
-              occupy: (order: number, unique: string, text: string) => void
+              occupy: (
+                order: number,
+                unique: string,
+                text: string,
+                userData: any
+              ) => void
               order: () => number
               pause: () => void
               play: (
                 option: import('v3d-player').V3dPlayerOptions | undefined
               ) => void
               playRate: (rate: number) => number
+              position: () => number
               seek: (time: number) => void
               snapshot: () => void
               status: () => number
@@ -2619,6 +2850,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 nonotice?: boolean | undefined
               ) => number
               unique: () => string | undefined
+              userData: () => any
             },
             unknown,
             {},
@@ -2629,8 +2861,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'progress'
               | 'timeout'
               | 'loadeddata'
-              | 'screenshot'
+              | 'position'
               | 'fullscreen'
+              | 'screenshot'
               | 'play'
               | 'ready'
               | 'timeupdate'
@@ -2671,9 +2904,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               timeout: number
               screenshot: boolean
               fullscreen: boolean
+              allowPause: boolean
               border: boolean
               index: number
               controls: string
+              lang: string
               options: Record<string, any>
               poster: string
             },
@@ -2784,11 +3019,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           ): import('vue').WatchStopHandle
         } & Readonly<
           import('vue').ExtractPropTypes<{
+            allowPause: {
+              type: BooleanConstructor
+              default: boolean
+            }
             border: {
               type: BooleanConstructor
               default: boolean
             }
             fill: {
+              /**
+               * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+               */
               type: BooleanConstructor
               default: boolean
             }
@@ -2797,6 +3039,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               default: number
             }
             controls: {
+              type: StringConstructor
+              default: string
+            }
+            lang: {
               type: StringConstructor
               default: string
             }
@@ -2811,7 +3057,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             options: {
               type: ObjectConstructor
               default(): {
-                allowPause: boolean
                 autoplay: boolean
                 controls: boolean
                 contextmenu: never[]
@@ -2859,6 +3104,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             onTimeupdate?: ((...args: any[]) => any) | undefined
             onVolumechange?: ((...args: any[]) => any) | undefined
             onWaiting?: ((...args: any[]) => any) | undefined
+            onPosition?: ((...args: any[]) => any) | undefined
             onReady?: ((...args: any[]) => any) | undefined
             onFetch_start?: ((...args: any[]) => any) | undefined
             onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -2881,7 +3127,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             currentTime: () => number
             currentUrl: () => string
             el: () => any
-            error: (text: string) => void
+            error: (msg: string) => void
             focused: (focus?: boolean | undefined) => boolean | undefined
             getOptions: () =>
               | {
@@ -2939,17 +3185,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     | undefined
                   volume?: number | undefined
                   unique?: string | undefined
+                  userData?: any
+                  duration?: number | undefined
+                  startTime?: number | undefined
                 }
               | undefined
             index: () => number
+            locale: (key: string) => any
+            message: () => string
             muted: () => void
-            occupy: (order: number, unique: string, text: string) => void
+            occupy: (
+              order: number,
+              unique: string,
+              text: string,
+              userData: any
+            ) => void
             order: () => number
             pause: () => void
             play: (
               option: import('v3d-player').V3dPlayerOptions | undefined
             ) => void
             playRate: (rate: number) => number
+            position: () => number
             seek: (time: number) => void
             snapshot: () => void
             status: () => number
@@ -2961,6 +3218,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               nonotice?: boolean | undefined
             ) => number
             unique: () => string | undefined
+            userData: () => any
           }> & {} & import('vue').ComponentCustomProperties & {}
         __isFragment?: undefined
         __isTeleport?: undefined
@@ -2968,11 +3226,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
       } & import('vue').ComponentOptionsBase<
         Readonly<
           import('vue').ExtractPropTypes<{
+            allowPause: {
+              type: BooleanConstructor
+              default: boolean
+            }
             border: {
               type: BooleanConstructor
               default: boolean
             }
             fill: {
+              /**
+               * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+               */
               type: BooleanConstructor
               default: boolean
             }
@@ -2981,6 +3246,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               default: number
             }
             controls: {
+              type: StringConstructor
+              default: string
+            }
+            lang: {
               type: StringConstructor
               default: string
             }
@@ -2995,7 +3264,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             options: {
               type: ObjectConstructor
               default(): {
-                allowPause: boolean
                 autoplay: boolean
                 controls: boolean
                 contextmenu: never[]
@@ -3043,6 +3311,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           onTimeupdate?: ((...args: any[]) => any) | undefined
           onVolumechange?: ((...args: any[]) => any) | undefined
           onWaiting?: ((...args: any[]) => any) | undefined
+          onPosition?: ((...args: any[]) => any) | undefined
           onReady?: ((...args: any[]) => any) | undefined
           onFetch_start?: ((...args: any[]) => any) | undefined
           onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -3066,7 +3335,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           currentTime: () => number
           currentUrl: () => string
           el: () => any
-          error: (text: string) => void
+          error: (msg: string) => void
           focused: (focus?: boolean | undefined) => boolean | undefined
           getOptions: () =>
             | {
@@ -3124,17 +3393,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | undefined
                 volume?: number | undefined
                 unique?: string | undefined
+                userData?: any
+                duration?: number | undefined
+                startTime?: number | undefined
               }
             | undefined
           index: () => number
+          locale: (key: string) => any
+          message: () => string
           muted: () => void
-          occupy: (order: number, unique: string, text: string) => void
+          occupy: (
+            order: number,
+            unique: string,
+            text: string,
+            userData: any
+          ) => void
           order: () => number
           pause: () => void
           play: (
             option: import('v3d-player').V3dPlayerOptions | undefined
           ) => void
           playRate: (rate: number) => number
+          position: () => number
           seek: (time: number) => void
           snapshot: () => void
           status: () => number
@@ -3146,6 +3426,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             nonotice?: boolean | undefined
           ) => number
           unique: () => string | undefined
+          userData: () => any
         },
         unknown,
         {},
@@ -3156,8 +3437,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           | 'progress'
           | 'timeout'
           | 'loadeddata'
-          | 'screenshot'
+          | 'position'
           | 'fullscreen'
+          | 'screenshot'
           | 'play'
           | 'ready'
           | 'timeupdate'
@@ -3195,8 +3477,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         | 'progress'
         | 'timeout'
         | 'loadeddata'
-        | 'screenshot'
+        | 'position'
         | 'fullscreen'
+        | 'screenshot'
         | 'play'
         | 'ready'
         | 'timeupdate'
@@ -3235,9 +3518,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           timeout: number
           screenshot: boolean
           fullscreen: boolean
+          allowPause: boolean
           border: boolean
           index: number
           controls: string
+          lang: string
           options: Record<string, any>
           poster: string
         },
@@ -3251,6 +3536,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           $slots: {
             ready: (_: {}) => any
             loading: (_: {}) => any
+            error: (_: {}) => any
           }
         })
       getPlaying: (unique: string) =>
@@ -3263,20 +3549,29 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 timeout: number
                 screenshot: boolean
                 fullscreen: boolean
+                allowPause: boolean
                 border: boolean
                 index: number
                 controls: string
+                lang: string
                 options: Record<string, any>
                 poster: string
               }> &
                 Omit<
                   Readonly<
                     import('vue').ExtractPropTypes<{
+                      allowPause: {
+                        type: BooleanConstructor
+                        default: boolean
+                      }
                       border: {
                         type: BooleanConstructor
                         default: boolean
                       }
                       fill: {
+                        /**
+                         * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                         */
                         type: BooleanConstructor
                         default: boolean
                       }
@@ -3285,6 +3580,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         default: number
                       }
                       controls: {
+                        type: StringConstructor
+                        default: string
+                      }
+                      lang: {
                         type: StringConstructor
                         default: string
                       }
@@ -3299,7 +3598,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       options: {
                         type: ObjectConstructor
                         default(): {
-                          allowPause: boolean
                           autoplay: boolean
                           controls: boolean
                           contextmenu: never[]
@@ -3347,6 +3645,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     onTimeupdate?: ((...args: any[]) => any) | undefined
                     onVolumechange?: ((...args: any[]) => any) | undefined
                     onWaiting?: ((...args: any[]) => any) | undefined
+                    onPosition?: ((...args: any[]) => any) | undefined
                     onReady?: ((...args: any[]) => any) | undefined
                     onFetch_start?: ((...args: any[]) => any) | undefined
                     onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -3368,8 +3667,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     import('vue').ComponentCustomProps,
                   | 'fill'
                   | 'timeout'
-                  | 'screenshot'
                   | 'fullscreen'
+                  | 'lang'
+                  | 'screenshot'
+                  | 'allowPause'
                   | 'border'
                   | 'index'
                   | 'controls'
@@ -3446,8 +3747,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'progress'
                   | 'timeout'
                   | 'loadeddata'
-                  | 'screenshot'
+                  | 'position'
                   | 'fullscreen'
+                  | 'screenshot'
                   | 'play'
                   | 'ready'
                   | 'timeupdate'
@@ -3487,11 +3789,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               $options: import('vue').ComponentOptionsBase<
                 Readonly<
                   import('vue').ExtractPropTypes<{
+                    allowPause: {
+                      type: BooleanConstructor
+                      default: boolean
+                    }
                     border: {
                       type: BooleanConstructor
                       default: boolean
                     }
                     fill: {
+                      /**
+                       * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                       */
                       type: BooleanConstructor
                       default: boolean
                     }
@@ -3500,6 +3809,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       default: number
                     }
                     controls: {
+                      type: StringConstructor
+                      default: string
+                    }
+                    lang: {
                       type: StringConstructor
                       default: string
                     }
@@ -3514,7 +3827,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     options: {
                       type: ObjectConstructor
                       default(): {
-                        allowPause: boolean
                         autoplay: boolean
                         controls: boolean
                         contextmenu: never[]
@@ -3562,6 +3874,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   onTimeupdate?: ((...args: any[]) => any) | undefined
                   onVolumechange?: ((...args: any[]) => any) | undefined
                   onWaiting?: ((...args: any[]) => any) | undefined
+                  onPosition?: ((...args: any[]) => any) | undefined
                   onReady?: ((...args: any[]) => any) | undefined
                   onFetch_start?: ((...args: any[]) => any) | undefined
                   onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -3585,7 +3898,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   currentTime: () => number
                   currentUrl: () => string
                   el: () => any
-                  error: (text: string) => void
+                  error: (msg: string) => void
                   focused: (focus?: boolean | undefined) => boolean | undefined
                   getOptions: () =>
                     | {
@@ -3643,17 +3956,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                           | undefined
                         volume?: number | undefined
                         unique?: string | undefined
+                        userData?: any
+                        duration?: number | undefined
+                        startTime?: number | undefined
                       }
                     | undefined
                   index: () => number
+                  locale: (key: string) => any
+                  message: () => string
                   muted: () => void
-                  occupy: (order: number, unique: string, text: string) => void
+                  occupy: (
+                    order: number,
+                    unique: string,
+                    text: string,
+                    userData: any
+                  ) => void
                   order: () => number
                   pause: () => void
                   play: (
                     option: import('v3d-player').V3dPlayerOptions | undefined
                   ) => void
                   playRate: (rate: number) => number
+                  position: () => number
                   seek: (time: number) => void
                   snapshot: () => void
                   status: () => number
@@ -3665,6 +3989,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     nonotice?: boolean | undefined
                   ) => number
                   unique: () => string | undefined
+                  userData: () => any
                 },
                 unknown,
                 {},
@@ -3675,8 +4000,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | 'progress'
                   | 'timeout'
                   | 'loadeddata'
-                  | 'screenshot'
+                  | 'position'
                   | 'fullscreen'
+                  | 'screenshot'
                   | 'play'
                   | 'ready'
                   | 'timeupdate'
@@ -3717,9 +4043,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   timeout: number
                   screenshot: boolean
                   fullscreen: boolean
+                  allowPause: boolean
                   border: boolean
                   index: number
                   controls: string
+                  lang: string
                   options: Record<string, any>
                   poster: string
                 },
@@ -3830,11 +4158,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               ): import('vue').WatchStopHandle
             } & Readonly<
               import('vue').ExtractPropTypes<{
+                allowPause: {
+                  type: BooleanConstructor
+                  default: boolean
+                }
                 border: {
                   type: BooleanConstructor
                   default: boolean
                 }
                 fill: {
+                  /**
+                   * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                   */
                   type: BooleanConstructor
                   default: boolean
                 }
@@ -3843,6 +4178,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   default: number
                 }
                 controls: {
+                  type: StringConstructor
+                  default: string
+                }
+                lang: {
                   type: StringConstructor
                   default: string
                 }
@@ -3857,7 +4196,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 options: {
                   type: ObjectConstructor
                   default(): {
-                    allowPause: boolean
                     autoplay: boolean
                     controls: boolean
                     contextmenu: never[]
@@ -3905,6 +4243,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 onTimeupdate?: ((...args: any[]) => any) | undefined
                 onVolumechange?: ((...args: any[]) => any) | undefined
                 onWaiting?: ((...args: any[]) => any) | undefined
+                onPosition?: ((...args: any[]) => any) | undefined
                 onReady?: ((...args: any[]) => any) | undefined
                 onFetch_start?: ((...args: any[]) => any) | undefined
                 onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -3927,7 +4266,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 currentTime: () => number
                 currentUrl: () => string
                 el: () => any
-                error: (text: string) => void
+                error: (msg: string) => void
                 focused: (focus?: boolean | undefined) => boolean | undefined
                 getOptions: () =>
                   | {
@@ -3985,17 +4324,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         | undefined
                       volume?: number | undefined
                       unique?: string | undefined
+                      userData?: any
+                      duration?: number | undefined
+                      startTime?: number | undefined
                     }
                   | undefined
                 index: () => number
+                locale: (key: string) => any
+                message: () => string
                 muted: () => void
-                occupy: (order: number, unique: string, text: string) => void
+                occupy: (
+                  order: number,
+                  unique: string,
+                  text: string,
+                  userData: any
+                ) => void
                 order: () => number
                 pause: () => void
                 play: (
                   option: import('v3d-player').V3dPlayerOptions | undefined
                 ) => void
                 playRate: (rate: number) => number
+                position: () => number
                 seek: (time: number) => void
                 snapshot: () => void
                 status: () => number
@@ -4007,6 +4357,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   nonotice?: boolean | undefined
                 ) => number
                 unique: () => string | undefined
+                userData: () => any
               }> & {} & import('vue').ComponentCustomProperties & {}
             __isFragment?: undefined
             __isTeleport?: undefined
@@ -4014,11 +4365,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           } & import('vue').ComponentOptionsBase<
             Readonly<
               import('vue').ExtractPropTypes<{
+                allowPause: {
+                  type: BooleanConstructor
+                  default: boolean
+                }
                 border: {
                   type: BooleanConstructor
                   default: boolean
                 }
                 fill: {
+                  /**
+                   * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                   */
                   type: BooleanConstructor
                   default: boolean
                 }
@@ -4027,6 +4385,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   default: number
                 }
                 controls: {
+                  type: StringConstructor
+                  default: string
+                }
+                lang: {
                   type: StringConstructor
                   default: string
                 }
@@ -4041,7 +4403,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 options: {
                   type: ObjectConstructor
                   default(): {
-                    allowPause: boolean
                     autoplay: boolean
                     controls: boolean
                     contextmenu: never[]
@@ -4089,6 +4450,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               onTimeupdate?: ((...args: any[]) => any) | undefined
               onVolumechange?: ((...args: any[]) => any) | undefined
               onWaiting?: ((...args: any[]) => any) | undefined
+              onPosition?: ((...args: any[]) => any) | undefined
               onReady?: ((...args: any[]) => any) | undefined
               onFetch_start?: ((...args: any[]) => any) | undefined
               onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -4112,7 +4474,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               currentTime: () => number
               currentUrl: () => string
               el: () => any
-              error: (text: string) => void
+              error: (msg: string) => void
               focused: (focus?: boolean | undefined) => boolean | undefined
               getOptions: () =>
                 | {
@@ -4170,17 +4532,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       | undefined
                     volume?: number | undefined
                     unique?: string | undefined
+                    userData?: any
+                    duration?: number | undefined
+                    startTime?: number | undefined
                   }
                 | undefined
               index: () => number
+              locale: (key: string) => any
+              message: () => string
               muted: () => void
-              occupy: (order: number, unique: string, text: string) => void
+              occupy: (
+                order: number,
+                unique: string,
+                text: string,
+                userData: any
+              ) => void
               order: () => number
               pause: () => void
               play: (
                 option: import('v3d-player').V3dPlayerOptions | undefined
               ) => void
               playRate: (rate: number) => number
+              position: () => number
               seek: (time: number) => void
               snapshot: () => void
               status: () => number
@@ -4192,6 +4565,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 nonotice?: boolean | undefined
               ) => number
               unique: () => string | undefined
+              userData: () => any
             },
             unknown,
             {},
@@ -4202,8 +4576,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'progress'
               | 'timeout'
               | 'loadeddata'
-              | 'screenshot'
+              | 'position'
               | 'fullscreen'
+              | 'screenshot'
               | 'play'
               | 'ready'
               | 'timeupdate'
@@ -4241,8 +4616,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             | 'progress'
             | 'timeout'
             | 'loadeddata'
-            | 'screenshot'
+            | 'position'
             | 'fullscreen'
+            | 'screenshot'
             | 'play'
             | 'ready'
             | 'timeupdate'
@@ -4281,9 +4657,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               timeout: number
               screenshot: boolean
               fullscreen: boolean
+              allowPause: boolean
               border: boolean
               index: number
               controls: string
+              lang: string
               options: Record<string, any>
               poster: string
             },
@@ -4297,6 +4675,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               $slots: {
                 ready: (_: {}) => any
                 loading: (_: {}) => any
+                error: (_: {}) => any
               }
             }))
         | undefined
@@ -4309,20 +4688,29 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             timeout: number
             screenshot: boolean
             fullscreen: boolean
+            allowPause: boolean
             border: boolean
             index: number
             controls: string
+            lang: string
             options: Record<string, any>
             poster: string
           }> &
             Omit<
               Readonly<
                 import('vue').ExtractPropTypes<{
+                  allowPause: {
+                    type: BooleanConstructor
+                    default: boolean
+                  }
                   border: {
                     type: BooleanConstructor
                     default: boolean
                   }
                   fill: {
+                    /**
+                     * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                     */
                     type: BooleanConstructor
                     default: boolean
                   }
@@ -4331,6 +4719,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     default: number
                   }
                   controls: {
+                    type: StringConstructor
+                    default: string
+                  }
+                  lang: {
                     type: StringConstructor
                     default: string
                   }
@@ -4345,7 +4737,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   options: {
                     type: ObjectConstructor
                     default(): {
-                      allowPause: boolean
                       autoplay: boolean
                       controls: boolean
                       contextmenu: never[]
@@ -4393,6 +4784,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 onTimeupdate?: ((...args: any[]) => any) | undefined
                 onVolumechange?: ((...args: any[]) => any) | undefined
                 onWaiting?: ((...args: any[]) => any) | undefined
+                onPosition?: ((...args: any[]) => any) | undefined
                 onReady?: ((...args: any[]) => any) | undefined
                 onFetch_start?: ((...args: any[]) => any) | undefined
                 onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -4414,8 +4806,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 import('vue').ComponentCustomProps,
               | 'fill'
               | 'timeout'
-              | 'screenshot'
               | 'fullscreen'
+              | 'lang'
+              | 'screenshot'
+              | 'allowPause'
               | 'border'
               | 'index'
               | 'controls'
@@ -4492,8 +4886,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'progress'
               | 'timeout'
               | 'loadeddata'
-              | 'screenshot'
+              | 'position'
               | 'fullscreen'
+              | 'screenshot'
               | 'play'
               | 'ready'
               | 'timeupdate'
@@ -4533,11 +4928,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           $options: import('vue').ComponentOptionsBase<
             Readonly<
               import('vue').ExtractPropTypes<{
+                allowPause: {
+                  type: BooleanConstructor
+                  default: boolean
+                }
                 border: {
                   type: BooleanConstructor
                   default: boolean
                 }
                 fill: {
+                  /**
+                   * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                   */
                   type: BooleanConstructor
                   default: boolean
                 }
@@ -4546,6 +4948,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   default: number
                 }
                 controls: {
+                  type: StringConstructor
+                  default: string
+                }
+                lang: {
                   type: StringConstructor
                   default: string
                 }
@@ -4560,7 +4966,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 options: {
                   type: ObjectConstructor
                   default(): {
-                    allowPause: boolean
                     autoplay: boolean
                     controls: boolean
                     contextmenu: never[]
@@ -4608,6 +5013,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               onTimeupdate?: ((...args: any[]) => any) | undefined
               onVolumechange?: ((...args: any[]) => any) | undefined
               onWaiting?: ((...args: any[]) => any) | undefined
+              onPosition?: ((...args: any[]) => any) | undefined
               onReady?: ((...args: any[]) => any) | undefined
               onFetch_start?: ((...args: any[]) => any) | undefined
               onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -4631,7 +5037,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               currentTime: () => number
               currentUrl: () => string
               el: () => any
-              error: (text: string) => void
+              error: (msg: string) => void
               focused: (focus?: boolean | undefined) => boolean | undefined
               getOptions: () =>
                 | {
@@ -4689,17 +5095,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       | undefined
                     volume?: number | undefined
                     unique?: string | undefined
+                    userData?: any
+                    duration?: number | undefined
+                    startTime?: number | undefined
                   }
                 | undefined
               index: () => number
+              locale: (key: string) => any
+              message: () => string
               muted: () => void
-              occupy: (order: number, unique: string, text: string) => void
+              occupy: (
+                order: number,
+                unique: string,
+                text: string,
+                userData: any
+              ) => void
               order: () => number
               pause: () => void
               play: (
                 option: import('v3d-player').V3dPlayerOptions | undefined
               ) => void
               playRate: (rate: number) => number
+              position: () => number
               seek: (time: number) => void
               snapshot: () => void
               status: () => number
@@ -4711,6 +5128,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 nonotice?: boolean | undefined
               ) => number
               unique: () => string | undefined
+              userData: () => any
             },
             unknown,
             {},
@@ -4721,8 +5139,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'progress'
               | 'timeout'
               | 'loadeddata'
-              | 'screenshot'
+              | 'position'
               | 'fullscreen'
+              | 'screenshot'
               | 'play'
               | 'ready'
               | 'timeupdate'
@@ -4763,9 +5182,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               timeout: number
               screenshot: boolean
               fullscreen: boolean
+              allowPause: boolean
               border: boolean
               index: number
               controls: string
+              lang: string
               options: Record<string, any>
               poster: string
             },
@@ -4876,11 +5297,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           ): import('vue').WatchStopHandle
         } & Readonly<
           import('vue').ExtractPropTypes<{
+            allowPause: {
+              type: BooleanConstructor
+              default: boolean
+            }
             border: {
               type: BooleanConstructor
               default: boolean
             }
             fill: {
+              /**
+               * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+               */
               type: BooleanConstructor
               default: boolean
             }
@@ -4889,6 +5317,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               default: number
             }
             controls: {
+              type: StringConstructor
+              default: string
+            }
+            lang: {
               type: StringConstructor
               default: string
             }
@@ -4903,7 +5335,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             options: {
               type: ObjectConstructor
               default(): {
-                allowPause: boolean
                 autoplay: boolean
                 controls: boolean
                 contextmenu: never[]
@@ -4951,6 +5382,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             onTimeupdate?: ((...args: any[]) => any) | undefined
             onVolumechange?: ((...args: any[]) => any) | undefined
             onWaiting?: ((...args: any[]) => any) | undefined
+            onPosition?: ((...args: any[]) => any) | undefined
             onReady?: ((...args: any[]) => any) | undefined
             onFetch_start?: ((...args: any[]) => any) | undefined
             onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -4973,7 +5405,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             currentTime: () => number
             currentUrl: () => string
             el: () => any
-            error: (text: string) => void
+            error: (msg: string) => void
             focused: (focus?: boolean | undefined) => boolean | undefined
             getOptions: () =>
               | {
@@ -5031,17 +5463,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     | undefined
                   volume?: number | undefined
                   unique?: string | undefined
+                  userData?: any
+                  duration?: number | undefined
+                  startTime?: number | undefined
                 }
               | undefined
             index: () => number
+            locale: (key: string) => any
+            message: () => string
             muted: () => void
-            occupy: (order: number, unique: string, text: string) => void
+            occupy: (
+              order: number,
+              unique: string,
+              text: string,
+              userData: any
+            ) => void
             order: () => number
             pause: () => void
             play: (
               option: import('v3d-player').V3dPlayerOptions | undefined
             ) => void
             playRate: (rate: number) => number
+            position: () => number
             seek: (time: number) => void
             snapshot: () => void
             status: () => number
@@ -5053,6 +5496,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               nonotice?: boolean | undefined
             ) => number
             unique: () => string | undefined
+            userData: () => any
           }> & {} & import('vue').ComponentCustomProperties & {}
         __isFragment?: undefined
         __isTeleport?: undefined
@@ -5060,11 +5504,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
       } & import('vue').ComponentOptionsBase<
         Readonly<
           import('vue').ExtractPropTypes<{
+            allowPause: {
+              type: BooleanConstructor
+              default: boolean
+            }
             border: {
               type: BooleanConstructor
               default: boolean
             }
             fill: {
+              /**
+               * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+               */
               type: BooleanConstructor
               default: boolean
             }
@@ -5073,6 +5524,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               default: number
             }
             controls: {
+              type: StringConstructor
+              default: string
+            }
+            lang: {
               type: StringConstructor
               default: string
             }
@@ -5087,7 +5542,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             options: {
               type: ObjectConstructor
               default(): {
-                allowPause: boolean
                 autoplay: boolean
                 controls: boolean
                 contextmenu: never[]
@@ -5135,6 +5589,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           onTimeupdate?: ((...args: any[]) => any) | undefined
           onVolumechange?: ((...args: any[]) => any) | undefined
           onWaiting?: ((...args: any[]) => any) | undefined
+          onPosition?: ((...args: any[]) => any) | undefined
           onReady?: ((...args: any[]) => any) | undefined
           onFetch_start?: ((...args: any[]) => any) | undefined
           onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -5158,7 +5613,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           currentTime: () => number
           currentUrl: () => string
           el: () => any
-          error: (text: string) => void
+          error: (msg: string) => void
           focused: (focus?: boolean | undefined) => boolean | undefined
           getOptions: () =>
             | {
@@ -5216,17 +5671,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   | undefined
                 volume?: number | undefined
                 unique?: string | undefined
+                userData?: any
+                duration?: number | undefined
+                startTime?: number | undefined
               }
             | undefined
           index: () => number
+          locale: (key: string) => any
+          message: () => string
           muted: () => void
-          occupy: (order: number, unique: string, text: string) => void
+          occupy: (
+            order: number,
+            unique: string,
+            text: string,
+            userData: any
+          ) => void
           order: () => number
           pause: () => void
           play: (
             option: import('v3d-player').V3dPlayerOptions | undefined
           ) => void
           playRate: (rate: number) => number
+          position: () => number
           seek: (time: number) => void
           snapshot: () => void
           status: () => number
@@ -5238,6 +5704,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             nonotice?: boolean | undefined
           ) => number
           unique: () => string | undefined
+          userData: () => any
         },
         unknown,
         {},
@@ -5248,8 +5715,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           | 'progress'
           | 'timeout'
           | 'loadeddata'
-          | 'screenshot'
+          | 'position'
           | 'fullscreen'
+          | 'screenshot'
           | 'play'
           | 'ready'
           | 'timeupdate'
@@ -5287,8 +5755,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         | 'progress'
         | 'timeout'
         | 'loadeddata'
-        | 'screenshot'
+        | 'position'
         | 'fullscreen'
+        | 'screenshot'
         | 'play'
         | 'ready'
         | 'timeupdate'
@@ -5327,9 +5796,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           timeout: number
           screenshot: boolean
           fullscreen: boolean
+          allowPause: boolean
           border: boolean
           index: number
           controls: string
+          lang: string
           options: Record<string, any>
           poster: string
         },
@@ -5343,6 +5814,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           $slots: {
             ready: (_: {}) => any
             loading: (_: {}) => any
+            error: (_: {}) => any
           }
         })
       getViewCount: () => number
@@ -5358,20 +5830,29 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               timeout: number
               screenshot: boolean
               fullscreen: boolean
+              allowPause: boolean
               border: boolean
               index: number
               controls: string
+              lang: string
               options: Record<string, any>
               poster: string
             }> &
               Omit<
                 Readonly<
                   import('vue').ExtractPropTypes<{
+                    allowPause: {
+                      type: BooleanConstructor
+                      default: boolean
+                    }
                     border: {
                       type: BooleanConstructor
                       default: boolean
                     }
                     fill: {
+                      /**
+                       * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                       */
                       type: BooleanConstructor
                       default: boolean
                     }
@@ -5380,6 +5861,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       default: number
                     }
                     controls: {
+                      type: StringConstructor
+                      default: string
+                    }
+                    lang: {
                       type: StringConstructor
                       default: string
                     }
@@ -5394,7 +5879,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     options: {
                       type: ObjectConstructor
                       default(): {
-                        allowPause: boolean
                         autoplay: boolean
                         controls: boolean
                         contextmenu: never[]
@@ -5442,6 +5926,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   onTimeupdate?: ((...args: any[]) => any) | undefined
                   onVolumechange?: ((...args: any[]) => any) | undefined
                   onWaiting?: ((...args: any[]) => any) | undefined
+                  onPosition?: ((...args: any[]) => any) | undefined
                   onReady?: ((...args: any[]) => any) | undefined
                   onFetch_start?: ((...args: any[]) => any) | undefined
                   onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -5463,8 +5948,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   import('vue').ComponentCustomProps,
                 | 'fill'
                 | 'timeout'
-                | 'screenshot'
                 | 'fullscreen'
+                | 'lang'
+                | 'screenshot'
+                | 'allowPause'
                 | 'border'
                 | 'index'
                 | 'controls'
@@ -5541,8 +6028,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 | 'progress'
                 | 'timeout'
                 | 'loadeddata'
-                | 'screenshot'
+                | 'position'
                 | 'fullscreen'
+                | 'screenshot'
                 | 'play'
                 | 'ready'
                 | 'timeupdate'
@@ -5582,11 +6070,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             $options: import('vue').ComponentOptionsBase<
               Readonly<
                 import('vue').ExtractPropTypes<{
+                  allowPause: {
+                    type: BooleanConstructor
+                    default: boolean
+                  }
                   border: {
                     type: BooleanConstructor
                     default: boolean
                   }
                   fill: {
+                    /**
+                     * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                     */
                     type: BooleanConstructor
                     default: boolean
                   }
@@ -5595,6 +6090,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     default: number
                   }
                   controls: {
+                    type: StringConstructor
+                    default: string
+                  }
+                  lang: {
                     type: StringConstructor
                     default: string
                   }
@@ -5609,7 +6108,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   options: {
                     type: ObjectConstructor
                     default(): {
-                      allowPause: boolean
                       autoplay: boolean
                       controls: boolean
                       contextmenu: never[]
@@ -5657,6 +6155,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 onTimeupdate?: ((...args: any[]) => any) | undefined
                 onVolumechange?: ((...args: any[]) => any) | undefined
                 onWaiting?: ((...args: any[]) => any) | undefined
+                onPosition?: ((...args: any[]) => any) | undefined
                 onReady?: ((...args: any[]) => any) | undefined
                 onFetch_start?: ((...args: any[]) => any) | undefined
                 onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -5680,7 +6179,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 currentTime: () => number
                 currentUrl: () => string
                 el: () => any
-                error: (text: string) => void
+                error: (msg: string) => void
                 focused: (focus?: boolean | undefined) => boolean | undefined
                 getOptions: () =>
                   | {
@@ -5738,17 +6237,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         | undefined
                       volume?: number | undefined
                       unique?: string | undefined
+                      userData?: any
+                      duration?: number | undefined
+                      startTime?: number | undefined
                     }
                   | undefined
                 index: () => number
+                locale: (key: string) => any
+                message: () => string
                 muted: () => void
-                occupy: (order: number, unique: string, text: string) => void
+                occupy: (
+                  order: number,
+                  unique: string,
+                  text: string,
+                  userData: any
+                ) => void
                 order: () => number
                 pause: () => void
                 play: (
                   option: import('v3d-player').V3dPlayerOptions | undefined
                 ) => void
                 playRate: (rate: number) => number
+                position: () => number
                 seek: (time: number) => void
                 snapshot: () => void
                 status: () => number
@@ -5760,6 +6270,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   nonotice?: boolean | undefined
                 ) => number
                 unique: () => string | undefined
+                userData: () => any
               },
               unknown,
               {},
@@ -5770,8 +6281,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 | 'progress'
                 | 'timeout'
                 | 'loadeddata'
-                | 'screenshot'
+                | 'position'
                 | 'fullscreen'
+                | 'screenshot'
                 | 'play'
                 | 'ready'
                 | 'timeupdate'
@@ -5812,9 +6324,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 timeout: number
                 screenshot: boolean
                 fullscreen: boolean
+                allowPause: boolean
                 border: boolean
                 index: number
                 controls: string
+                lang: string
                 options: Record<string, any>
                 poster: string
               },
@@ -5925,11 +6439,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             ): import('vue').WatchStopHandle
           } & Readonly<
             import('vue').ExtractPropTypes<{
+              allowPause: {
+                type: BooleanConstructor
+                default: boolean
+              }
               border: {
                 type: BooleanConstructor
                 default: boolean
               }
               fill: {
+                /**
+                 * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                 */
                 type: BooleanConstructor
                 default: boolean
               }
@@ -5938,6 +6459,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 default: number
               }
               controls: {
+                type: StringConstructor
+                default: string
+              }
+              lang: {
                 type: StringConstructor
                 default: string
               }
@@ -5952,7 +6477,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               options: {
                 type: ObjectConstructor
                 default(): {
-                  allowPause: boolean
                   autoplay: boolean
                   controls: boolean
                   contextmenu: never[]
@@ -6000,6 +6524,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               onTimeupdate?: ((...args: any[]) => any) | undefined
               onVolumechange?: ((...args: any[]) => any) | undefined
               onWaiting?: ((...args: any[]) => any) | undefined
+              onPosition?: ((...args: any[]) => any) | undefined
               onReady?: ((...args: any[]) => any) | undefined
               onFetch_start?: ((...args: any[]) => any) | undefined
               onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -6022,7 +6547,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               currentTime: () => number
               currentUrl: () => string
               el: () => any
-              error: (text: string) => void
+              error: (msg: string) => void
               focused: (focus?: boolean | undefined) => boolean | undefined
               getOptions: () =>
                 | {
@@ -6080,17 +6605,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       | undefined
                     volume?: number | undefined
                     unique?: string | undefined
+                    userData?: any
+                    duration?: number | undefined
+                    startTime?: number | undefined
                   }
                 | undefined
               index: () => number
+              locale: (key: string) => any
+              message: () => string
               muted: () => void
-              occupy: (order: number, unique: string, text: string) => void
+              occupy: (
+                order: number,
+                unique: string,
+                text: string,
+                userData: any
+              ) => void
               order: () => number
               pause: () => void
               play: (
                 option: import('v3d-player').V3dPlayerOptions | undefined
               ) => void
               playRate: (rate: number) => number
+              position: () => number
               seek: (time: number) => void
               snapshot: () => void
               status: () => number
@@ -6102,6 +6638,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 nonotice?: boolean | undefined
               ) => number
               unique: () => string | undefined
+              userData: () => any
             }> & {} & import('vue').ComponentCustomProperties & {}
           __isFragment?: undefined
           __isTeleport?: undefined
@@ -6109,11 +6646,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         } & import('vue').ComponentOptionsBase<
           Readonly<
             import('vue').ExtractPropTypes<{
+              allowPause: {
+                type: BooleanConstructor
+                default: boolean
+              }
               border: {
                 type: BooleanConstructor
                 default: boolean
               }
               fill: {
+                /**
+                 * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                 */
                 type: BooleanConstructor
                 default: boolean
               }
@@ -6122,6 +6666,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 default: number
               }
               controls: {
+                type: StringConstructor
+                default: string
+              }
+              lang: {
                 type: StringConstructor
                 default: string
               }
@@ -6136,7 +6684,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               options: {
                 type: ObjectConstructor
                 default(): {
-                  allowPause: boolean
                   autoplay: boolean
                   controls: boolean
                   contextmenu: never[]
@@ -6184,6 +6731,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             onTimeupdate?: ((...args: any[]) => any) | undefined
             onVolumechange?: ((...args: any[]) => any) | undefined
             onWaiting?: ((...args: any[]) => any) | undefined
+            onPosition?: ((...args: any[]) => any) | undefined
             onReady?: ((...args: any[]) => any) | undefined
             onFetch_start?: ((...args: any[]) => any) | undefined
             onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -6207,7 +6755,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             currentTime: () => number
             currentUrl: () => string
             el: () => any
-            error: (text: string) => void
+            error: (msg: string) => void
             focused: (focus?: boolean | undefined) => boolean | undefined
             getOptions: () =>
               | {
@@ -6265,17 +6813,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     | undefined
                   volume?: number | undefined
                   unique?: string | undefined
+                  userData?: any
+                  duration?: number | undefined
+                  startTime?: number | undefined
                 }
               | undefined
             index: () => number
+            locale: (key: string) => any
+            message: () => string
             muted: () => void
-            occupy: (order: number, unique: string, text: string) => void
+            occupy: (
+              order: number,
+              unique: string,
+              text: string,
+              userData: any
+            ) => void
             order: () => number
             pause: () => void
             play: (
               option: import('v3d-player').V3dPlayerOptions | undefined
             ) => void
             playRate: (rate: number) => number
+            position: () => number
             seek: (time: number) => void
             snapshot: () => void
             status: () => number
@@ -6287,6 +6846,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               nonotice?: boolean | undefined
             ) => number
             unique: () => string | undefined
+            userData: () => any
           },
           unknown,
           {},
@@ -6297,8 +6857,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             | 'progress'
             | 'timeout'
             | 'loadeddata'
-            | 'screenshot'
+            | 'position'
             | 'fullscreen'
+            | 'screenshot'
             | 'play'
             | 'ready'
             | 'timeupdate'
@@ -6336,8 +6897,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           | 'progress'
           | 'timeout'
           | 'loadeddata'
-          | 'screenshot'
+          | 'position'
           | 'fullscreen'
+          | 'screenshot'
           | 'play'
           | 'ready'
           | 'timeupdate'
@@ -6376,9 +6938,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             timeout: number
             screenshot: boolean
             fullscreen: boolean
+            allowPause: boolean
             border: boolean
             index: number
             controls: string
+            lang: string
             options: Record<string, any>
             poster: string
           },
@@ -6392,6 +6956,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             $slots: {
               ready: (_: {}) => any
               loading: (_: {}) => any
+              error: (_: {}) => any
             }
           })
       ) => void
@@ -6407,20 +6972,29 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   timeout: number
                   screenshot: boolean
                   fullscreen: boolean
+                  allowPause: boolean
                   border: boolean
                   index: number
                   controls: string
+                  lang: string
                   options: Record<string, any>
                   poster: string
                 }> &
                   Omit<
                     Readonly<
                       import('vue').ExtractPropTypes<{
+                        allowPause: {
+                          type: BooleanConstructor
+                          default: boolean
+                        }
                         border: {
                           type: BooleanConstructor
                           default: boolean
                         }
                         fill: {
+                          /**
+                           * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                           */
                           type: BooleanConstructor
                           default: boolean
                         }
@@ -6429,6 +7003,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                           default: number
                         }
                         controls: {
+                          type: StringConstructor
+                          default: string
+                        }
+                        lang: {
                           type: StringConstructor
                           default: string
                         }
@@ -6443,7 +7021,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         options: {
                           type: ObjectConstructor
                           default(): {
-                            allowPause: boolean
                             autoplay: boolean
                             controls: boolean
                             contextmenu: never[]
@@ -6491,6 +7068,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       onTimeupdate?: ((...args: any[]) => any) | undefined
                       onVolumechange?: ((...args: any[]) => any) | undefined
                       onWaiting?: ((...args: any[]) => any) | undefined
+                      onPosition?: ((...args: any[]) => any) | undefined
                       onReady?: ((...args: any[]) => any) | undefined
                       onFetch_start?: ((...args: any[]) => any) | undefined
                       onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -6516,8 +7094,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       import('vue').ComponentCustomProps,
                     | 'fill'
                     | 'timeout'
-                    | 'screenshot'
                     | 'fullscreen'
+                    | 'lang'
+                    | 'screenshot'
+                    | 'allowPause'
                     | 'border'
                     | 'index'
                     | 'controls'
@@ -6594,8 +7174,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     | 'progress'
                     | 'timeout'
                     | 'loadeddata'
-                    | 'screenshot'
+                    | 'position'
                     | 'fullscreen'
+                    | 'screenshot'
                     | 'play'
                     | 'ready'
                     | 'timeupdate'
@@ -6635,11 +7216,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 $options: import('vue').ComponentOptionsBase<
                   Readonly<
                     import('vue').ExtractPropTypes<{
+                      allowPause: {
+                        type: BooleanConstructor
+                        default: boolean
+                      }
                       border: {
                         type: BooleanConstructor
                         default: boolean
                       }
                       fill: {
+                        /**
+                         * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                         */
                         type: BooleanConstructor
                         default: boolean
                       }
@@ -6648,6 +7236,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         default: number
                       }
                       controls: {
+                        type: StringConstructor
+                        default: string
+                      }
+                      lang: {
                         type: StringConstructor
                         default: string
                       }
@@ -6662,7 +7254,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       options: {
                         type: ObjectConstructor
                         default(): {
-                          allowPause: boolean
                           autoplay: boolean
                           controls: boolean
                           contextmenu: never[]
@@ -6710,6 +7301,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     onTimeupdate?: ((...args: any[]) => any) | undefined
                     onVolumechange?: ((...args: any[]) => any) | undefined
                     onWaiting?: ((...args: any[]) => any) | undefined
+                    onPosition?: ((...args: any[]) => any) | undefined
                     onReady?: ((...args: any[]) => any) | undefined
                     onFetch_start?: ((...args: any[]) => any) | undefined
                     onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -6733,7 +7325,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     currentTime: () => number
                     currentUrl: () => string
                     el: () => any
-                    error: (text: string) => void
+                    error: (msg: string) => void
                     focused: (
                       focus?: boolean | undefined
                     ) => boolean | undefined
@@ -6793,14 +7385,20 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                             | undefined
                           volume?: number | undefined
                           unique?: string | undefined
+                          userData?: any
+                          duration?: number | undefined
+                          startTime?: number | undefined
                         }
                       | undefined
                     index: () => number
+                    locale: (key: string) => any
+                    message: () => string
                     muted: () => void
                     occupy: (
                       order: number,
                       unique: string,
-                      text: string
+                      text: string,
+                      userData: any
                     ) => void
                     order: () => number
                     pause: () => void
@@ -6808,6 +7406,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       option: import('v3d-player').V3dPlayerOptions | undefined
                     ) => void
                     playRate: (rate: number) => number
+                    position: () => number
                     seek: (time: number) => void
                     snapshot: () => void
                     status: () => number
@@ -6819,6 +7418,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                       nonotice?: boolean | undefined
                     ) => number
                     unique: () => string | undefined
+                    userData: () => any
                   },
                   unknown,
                   {},
@@ -6829,8 +7429,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     | 'progress'
                     | 'timeout'
                     | 'loadeddata'
-                    | 'screenshot'
+                    | 'position'
                     | 'fullscreen'
+                    | 'screenshot'
                     | 'play'
                     | 'ready'
                     | 'timeupdate'
@@ -6871,9 +7472,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     timeout: number
                     screenshot: boolean
                     fullscreen: boolean
+                    allowPause: boolean
                     border: boolean
                     index: number
                     controls: string
+                    lang: string
                     options: Record<string, any>
                     poster: string
                   },
@@ -6984,11 +7587,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 ): import('vue').WatchStopHandle
               } & Readonly<
                 import('vue').ExtractPropTypes<{
+                  allowPause: {
+                    type: BooleanConstructor
+                    default: boolean
+                  }
                   border: {
                     type: BooleanConstructor
                     default: boolean
                   }
                   fill: {
+                    /**
+                     * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                     */
                     type: BooleanConstructor
                     default: boolean
                   }
@@ -6997,6 +7607,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     default: number
                   }
                   controls: {
+                    type: StringConstructor
+                    default: string
+                  }
+                  lang: {
                     type: StringConstructor
                     default: string
                   }
@@ -7011,7 +7625,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   options: {
                     type: ObjectConstructor
                     default(): {
-                      allowPause: boolean
                       autoplay: boolean
                       controls: boolean
                       contextmenu: never[]
@@ -7059,6 +7672,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   onTimeupdate?: ((...args: any[]) => any) | undefined
                   onVolumechange?: ((...args: any[]) => any) | undefined
                   onWaiting?: ((...args: any[]) => any) | undefined
+                  onPosition?: ((...args: any[]) => any) | undefined
                   onReady?: ((...args: any[]) => any) | undefined
                   onFetch_start?: ((...args: any[]) => any) | undefined
                   onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -7081,7 +7695,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   currentTime: () => number
                   currentUrl: () => string
                   el: () => any
-                  error: (text: string) => void
+                  error: (msg: string) => void
                   focused: (focus?: boolean | undefined) => boolean | undefined
                   getOptions: () =>
                     | {
@@ -7139,17 +7753,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                           | undefined
                         volume?: number | undefined
                         unique?: string | undefined
+                        userData?: any
+                        duration?: number | undefined
+                        startTime?: number | undefined
                       }
                     | undefined
                   index: () => number
+                  locale: (key: string) => any
+                  message: () => string
                   muted: () => void
-                  occupy: (order: number, unique: string, text: string) => void
+                  occupy: (
+                    order: number,
+                    unique: string,
+                    text: string,
+                    userData: any
+                  ) => void
                   order: () => number
                   pause: () => void
                   play: (
                     option: import('v3d-player').V3dPlayerOptions | undefined
                   ) => void
                   playRate: (rate: number) => number
+                  position: () => number
                   seek: (time: number) => void
                   snapshot: () => void
                   status: () => number
@@ -7161,6 +7786,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     nonotice?: boolean | undefined
                   ) => number
                   unique: () => string | undefined
+                  userData: () => any
                 }> & {} & import('vue').ComponentCustomProperties & {}
               __isFragment?: undefined
               __isTeleport?: undefined
@@ -7168,11 +7794,18 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
             } & import('vue').ComponentOptionsBase<
               Readonly<
                 import('vue').ExtractPropTypes<{
+                  allowPause: {
+                    type: BooleanConstructor
+                    default: boolean
+                  }
                   border: {
                     type: BooleanConstructor
                     default: boolean
                   }
                   fill: {
+                    /**
+                     * 只支持 1 4 6 8 9 10 16 25 36 64 分屏
+                     */
                     type: BooleanConstructor
                     default: boolean
                   }
@@ -7181,6 +7814,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                     default: number
                   }
                   controls: {
+                    type: StringConstructor
+                    default: string
+                  }
+                  lang: {
                     type: StringConstructor
                     default: string
                   }
@@ -7195,7 +7832,6 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   options: {
                     type: ObjectConstructor
                     default(): {
-                      allowPause: boolean
                       autoplay: boolean
                       controls: boolean
                       contextmenu: never[]
@@ -7243,6 +7879,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 onTimeupdate?: ((...args: any[]) => any) | undefined
                 onVolumechange?: ((...args: any[]) => any) | undefined
                 onWaiting?: ((...args: any[]) => any) | undefined
+                onPosition?: ((...args: any[]) => any) | undefined
                 onReady?: ((...args: any[]) => any) | undefined
                 onFetch_start?: ((...args: any[]) => any) | undefined
                 onFetch_stop?: ((...args: any[]) => any) | undefined
@@ -7266,7 +7903,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 currentTime: () => number
                 currentUrl: () => string
                 el: () => any
-                error: (text: string) => void
+                error: (msg: string) => void
                 focused: (focus?: boolean | undefined) => boolean | undefined
                 getOptions: () =>
                   | {
@@ -7324,17 +7961,28 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                         | undefined
                       volume?: number | undefined
                       unique?: string | undefined
+                      userData?: any
+                      duration?: number | undefined
+                      startTime?: number | undefined
                     }
                   | undefined
                 index: () => number
+                locale: (key: string) => any
+                message: () => string
                 muted: () => void
-                occupy: (order: number, unique: string, text: string) => void
+                occupy: (
+                  order: number,
+                  unique: string,
+                  text: string,
+                  userData: any
+                ) => void
                 order: () => number
                 pause: () => void
                 play: (
                   option: import('v3d-player').V3dPlayerOptions | undefined
                 ) => void
                 playRate: (rate: number) => number
+                position: () => number
                 seek: (time: number) => void
                 snapshot: () => void
                 status: () => number
@@ -7346,6 +7994,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                   nonotice?: boolean | undefined
                 ) => number
                 unique: () => string | undefined
+                userData: () => any
               },
               unknown,
               {},
@@ -7356,8 +8005,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 | 'progress'
                 | 'timeout'
                 | 'loadeddata'
-                | 'screenshot'
+                | 'position'
                 | 'fullscreen'
+                | 'screenshot'
                 | 'play'
                 | 'ready'
                 | 'timeupdate'
@@ -7395,8 +8045,9 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
               | 'progress'
               | 'timeout'
               | 'loadeddata'
-              | 'screenshot'
+              | 'position'
               | 'fullscreen'
+              | 'screenshot'
               | 'play'
               | 'ready'
               | 'timeupdate'
@@ -7435,9 +8086,11 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 timeout: number
                 screenshot: boolean
                 fullscreen: boolean
+                allowPause: boolean
                 border: boolean
                 index: number
                 controls: string
+                lang: string
                 options: Record<string, any>
                 poster: string
               },
@@ -7451,6 +8104,7 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
                 $slots: {
                   ready: (_: {}) => any
                   loading: (_: {}) => any
+                  error: (_: {}) => any
                 }
               })),
         msg: string
@@ -7464,8 +8118,8 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
     {},
     import('vue').ComponentOptionsMixin,
     import('vue').ComponentOptionsMixin,
-    ('timeout' | 'loadeddata')[],
-    'timeout' | 'loadeddata',
+    ('refresh' | 'timeout' | 'loadeddata' | 'position')[],
+    'refresh' | 'timeout' | 'loadeddata' | 'position',
     import('vue').VNodeProps &
       import('vue').AllowedComponentProps &
       import('vue').ComponentCustomProps,
@@ -7474,6 +8128,10 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
         closeAfterViewChange: {
           type: BooleanConstructor
           default: boolean
+        }
+        closeTime: {
+          type: NumberConstructor
+          default: number
         }
         controlBar: {
           type: (BooleanConstructor | ObjectConstructor)[]
@@ -7491,13 +8149,13 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           type: BooleanConstructor
           default: boolean
         }
-        closeTime: {
-          type: NumberConstructor
-          default: number
+        fullscreen: {
+          type: BooleanConstructor
+          default: boolean
         }
-        timeout: {
-          type: NumberConstructor
-          default: number
+        lang: {
+          type: StringConstructor
+          default(): string
         }
         /**
          * 常驻工具栏
@@ -7506,17 +8164,17 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
           type: StringConstructor
           default: string
         }
+        loopCreate: {
+          type: BooleanConstructor
+          default: boolean
+        }
         screenshot: {
           type: BooleanConstructor
           default: boolean
         }
-        fullscreen: {
-          type: BooleanConstructor
-          default: boolean
-        }
-        loopCreate: {
-          type: BooleanConstructor
-          default: boolean
+        timeout: {
+          type: NumberConstructor
+          default: number
         }
         theme: {
           type: StringConstructor
@@ -7525,20 +8183,23 @@ declare const V3dMonitor: __VLS_WithTemplateSlots<
       }>
     > & {
       onLoadeddata?: ((...args: any[]) => any) | undefined
+      onRefresh?: ((...args: any[]) => any) | undefined
       onTimeout?: ((...args: any[]) => any) | undefined
+      onPosition?: ((...args: any[]) => any) | undefined
     },
     {
       timeout: number
       closeAfterViewChange: boolean
+      closeTime: number
       controlBar: boolean | Record<string, any>
       count: number
       duplicate: boolean
       focused: boolean
-      closeTime: number
-      lockControls: string
-      screenshot: boolean
       fullscreen: boolean
+      lang: string
+      lockControls: string
       loopCreate: boolean
+      screenshot: boolean
       theme: string
     }
   >,
