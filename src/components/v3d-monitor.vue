@@ -3,6 +3,7 @@
     <div ref="refView" class="v3m-view" :class="viewCls">
       <v3d-player
         v-for="(item, index) in self.videos"
+        :draggable="props.drag"
         :key="item.id"
         :ref="setPlayerRef"
         :border="item.border"
@@ -19,6 +20,9 @@
         @click="doClick(index)"
         @error="doError(index)"
         @dblclick.stop.prevent="doDbClick(index)"
+        @drop="doDrop($event, index)"
+        @dragover="doDragOver($event)"
+        @dragstart="doDragStart($event, index)"
       >
         <template v-slot:ready>
           <template v-if="slots.ready">
@@ -186,69 +190,45 @@ const defaultControlBar = {
   button: ['1', '4', '6', '8', '9', '10', '16', 'fill', 'mute', 'stop', 'clear']
 }
 
-const props = defineProps({
-  closeAfterViewChange: {
-    type: Boolean,
-    default: false
-  },
-  // 关闭时间 毫秒
-  closeTime: {
-    type: Number,
-    default: 0
-  },
-  controlBar: {
-    type: [Object, Boolean],
-    default: true
-  },
-  count: {
-    type: Number,
-    default: 4
-  },
-  // 是否允许使用同一个地址打开多个窗口 true=允许 false=不允许重复 默认false
-  duplicate: {
-    type: Boolean,
-    default: false
-  },
-  focused: {
-    type: Boolean,
-    default: true
-  },
-  fullscreen: {
-    type: Boolean,
-    default: true
-  },
-  lang: {
-    type: String,
-    default() {
-      return navigator.language.toLowerCase()
-    }
-  },
-  /**
-   * 常驻工具栏
-   */
-  lockControls: {
-    type: String,
-    default: 'auto'
-  },
-  // 循环创建 不管其他窗口是否打开 关掉最先打开的窗口 并播放新的视频
-  loopCreate: {
-    type: Boolean,
-    default: true
-  },
-  screenshot: {
-    type: Boolean,
-    default: true
-  },
-  // 超时时间 毫秒
-  timeout: {
-    type: Number,
-    default: 10000
-  },
-  theme: {
-    type: String,
-    default: ''
+const props = withDefaults(
+  defineProps<{
+    closeAfterViewChange: boolean
+    // 关闭时间 毫秒
+    closeTime: number
+    controlBar: V3dControlBar | boolean
+    count: number
+    drag: boolean
+    // 是否允许使用同一个地址打开多个窗口 true=允许 false=不允许重复 默认false
+    duplicate: boolean
+    focused: boolean
+    fullscreen: boolean
+    lang: string
+    // 常驻工具栏
+    lockControls: string
+    // 循环创建 不管其他窗口是否打开 关掉最先打开的窗口 并播放新的视频
+    loopCreate: boolean
+    screenshot: boolean
+    // 超时时间 毫秒
+    timeout: number
+    theme: string
+  }>(),
+  {
+    closeAfterViewChange: false,
+    closeTime: 0,
+    controlBar: false,
+    count: 4,
+    drag: false,
+    duplicate: false,
+    focused: true,
+    fullscreen: true,
+    lang: navigator.language.toLowerCase(),
+    lockControls: 'auto',
+    loopCreate: true,
+    screenshot: true,
+    timeout: 10000,
+    theme: ''
   }
-})
+)
 
 interface SelectedParam {
   id: number
@@ -277,6 +257,7 @@ interface Data {
   filled: boolean
   createOrder: number
   controlBar: V3dControlBar
+  drag: number
 }
 
 const _data: Data = {
@@ -291,7 +272,8 @@ const _data: Data = {
   },
   filled: true,
   createOrder: new Date().getTime(),
-  controlBar: defaultControlBar
+  controlBar: defaultControlBar,
+  drag: -1
 }
 
 let self = reactive(_data)
@@ -560,6 +542,70 @@ const doDbClick = (index: number) => {
   } else {
     self.viewMax = player
     self.videos[index].cls = calcCls(index) + ' v3d-max'
+  }
+}
+
+const doDrop = (ev: DragEvent, index: number) => {
+  // 拖放到的窗口
+  const source = parseInt(ev.dataTransfer?.getData('id') || '-1')
+  if (source > -1) {
+    if (source === index) {
+      // 自己不处理
+      return
+    }
+    const playerDest = getPlayerById(index)
+    const playerSource = getPlayerById(source)
+    // 至少有一个是在播放中才能换
+    const statusDest = playerDest.status()
+    const statusSource = playerSource.status()
+    const allows = [0, 3]
+    if (statusDest === 0 && statusSource === 0) {
+      // 按在手上 时间到关掉了的窗口
+      return
+    }
+    if (
+      allows.indexOf(statusDest) !== -1 &&
+      allows.indexOf(statusSource) !== -1
+    ) {
+      // 只有两个窗口都是播放或空闲的状态才能换
+      if (statusDest === 3) {
+        // 目标播放中
+        if (statusSource === 3) {
+          // 源播放中
+          const OptDest = playerDest.getOptions()
+          const OptSource = playerSource.getOptions()
+          playerSource.play(OptDest)
+          playerDest.play(OptSource)
+        } else {
+          // 源没播放 按手上还没放 倒计时到关闭了
+          playerSource.play(playerDest.getOptions())
+          playerDest.close()
+        }
+      } else {
+        // 目标没播放
+        playerDest.play(playerSource.getOptions())
+        playerSource.close()
+      }
+    }
+  }
+}
+
+const doDragOver = (ev: DragEvent) => {
+  // 经过的窗口
+  if (self.drag > -1) {
+    // 源窗口正在播放才生效
+    ev.preventDefault()
+  }
+}
+
+const doDragStart = (ev: DragEvent, index: number) => {
+  // 拖动的窗口
+  const player = getPlayerById(index)
+  if (player.status() === 3) {
+    ev.dataTransfer?.setData('id', index.toString())
+    self.drag = index
+  } else {
+    self.drag = -1
   }
 }
 

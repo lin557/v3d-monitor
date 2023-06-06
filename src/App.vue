@@ -3,6 +3,7 @@
     <v3d-monitor
       ref="refMonitor"
       class="v3m-theme-blue"
+      :drag="drag"
       :count="count"
       :lock-controls="lockControls"
       :timeout="3000"
@@ -73,6 +74,13 @@
       <button @click="toggleShot">screenshot</button>
       <button @click="toggleFull">fullscreen</button>
       <button @click="showError">error</button>
+      <input
+        style="width: 25px; min-width: 25px"
+        type="checkbox"
+        name="drag"
+        v-model="drag"
+      />
+      <label for="drag">Drag</label>
     </div>
 
     <div class="demo-title">
@@ -220,6 +228,7 @@ const controlBar = ref({
 })
 
 const lockControls = ref('auto')
+const drag = ref(true)
 
 const count = ref(9)
 const closeTime = ref(300000)
