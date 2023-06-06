@@ -196,7 +196,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import V3dMonitor from './components/v3d-monitor.vue'
 
 import V3dPlayer from 'v3d-player'
@@ -208,7 +208,7 @@ import { Player } from '../d.ts/index'
 
 const refMonitor = ref()
 
-const controlBar = ref({
+const _bar = {
   enabled: true,
   position: 'top',
   button: [
@@ -225,7 +225,9 @@ const controlBar = ref({
     'stop',
     'clear'
   ]
-})
+}
+
+const controlBar = reactive(_bar)
 
 const lockControls = ref('auto')
 const drag = ref(true)
@@ -283,7 +285,7 @@ const toggleFull = () => {
 
 const toggleControlBar = () => {
   // controlBar1.value = false
-  controlBar.value.enabled = !controlBar.value.enabled
+  controlBar.enabled = !controlBar.enabled
 }
 
 const showError = () => {
@@ -341,8 +343,8 @@ const play = (index: number) => {
     },
     {
       title: '浙江卫视',
-      src: 'https://xn.transcodegroup.cn:8587/mdvr/live/8998_1.flv',
-      //src: 'http://hw-vl.cztv.com/channels/lantian/channel01/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=d0c0b9d2821a784c8527a7892b0555bf&t=1680572871'
+      //src: 'https://xn.transcodegroup.cn:8587/mdvr/live/8998_1.flv',
+      src: 'http://hw-vl.cztv.com/channels/lantian/channel01/360p.m3u8?a=1000&d=2e81e5ce97d2a771861cbe3b0c492876&k=d0c0b9d2821a784c8527a7892b0555bf&t=1680572871',
       userData: {
         test1: '1',
         test2: '2'

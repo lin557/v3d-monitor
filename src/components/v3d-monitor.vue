@@ -190,45 +190,73 @@ const defaultControlBar = {
   button: ['1', '4', '6', '8', '9', '10', '16', 'fill', 'mute', 'stop', 'clear']
 }
 
-const props = withDefaults(
-  defineProps<{
-    closeAfterViewChange: boolean
-    // 关闭时间 毫秒
-    closeTime: number
-    controlBar: V3dControlBar | boolean
-    count: number
-    drag: boolean
-    // 是否允许使用同一个地址打开多个窗口 true=允许 false=不允许重复 默认false
-    duplicate: boolean
-    focused: boolean
-    fullscreen: boolean
-    lang: string
-    // 常驻工具栏
-    lockControls: string
-    // 循环创建 不管其他窗口是否打开 关掉最先打开的窗口 并播放新的视频
-    loopCreate: boolean
-    screenshot: boolean
-    // 超时时间 毫秒
-    timeout: number
-    theme: string
-  }>(),
-  {
-    closeAfterViewChange: false,
-    closeTime: 0,
-    controlBar: false,
-    count: 4,
-    drag: false,
-    duplicate: false,
-    focused: true,
-    fullscreen: true,
-    lang: navigator.language.toLowerCase(),
-    lockControls: 'auto',
-    loopCreate: true,
-    screenshot: true,
-    timeout: 10000,
-    theme: ''
+const props = defineProps({
+  closeAfterViewChange: {
+    type: Boolean,
+    default: false
+  },
+  // 关闭时间 毫秒
+  closeTime: {
+    type: Number,
+    default: 0
+  },
+  controlBar: {
+    type: [Object, Boolean],
+    default: true
+  },
+  count: {
+    type: Number,
+    default: 4
+  },
+  drag: {
+    type: Boolean,
+    default: false
+  },
+  // 是否允许使用同一个地址打开多个窗口 true=允许 false=不允许重复 默认false
+  duplicate: {
+    type: Boolean,
+    default: false
+  },
+  focused: {
+    type: Boolean,
+    default: true
+  },
+  fullscreen: {
+    type: Boolean,
+    default: true
+  },
+  lang: {
+    type: String,
+    default() {
+      return navigator.language.toLowerCase()
+    }
+  },
+  /**
+   * 常驻工具栏
+   */
+  lockControls: {
+    type: String,
+    default: 'auto'
+  },
+  // 循环创建 不管其他窗口是否打开 关掉最先打开的窗口 并播放新的视频
+  loopCreate: {
+    type: Boolean,
+    default: true
+  },
+  screenshot: {
+    type: Boolean,
+    default: true
+  },
+  // 超时时间 毫秒
+  timeout: {
+    type: Number,
+    default: 10000
+  },
+  theme: {
+    type: String,
+    default: ''
   }
-)
+})
 
 interface SelectedParam {
   id: number
@@ -573,16 +601,20 @@ const doDrop = (ev: DragEvent, index: number) => {
         if (statusSource === 3) {
           // 源播放中
           const OptDest = playerDest.getOptions()
+          OptDest.startTime = playerDest.currentTime()
           const OptSource = playerSource.getOptions()
+          OptSource.startTime = playerSource.currentTime()
           playerSource.play(OptDest)
           playerDest.play(OptSource)
         } else {
           // 源没播放 按手上还没放 倒计时到关闭了
+          playerDest.getOptions().startTime = playerDest.currentTime()
           playerSource.play(playerDest.getOptions())
           playerDest.close()
         }
       } else {
         // 目标没播放
+        playerSource.getOptions().startTime = playerSource.currentTime()
         playerDest.play(playerSource.getOptions())
         playerSource.close()
       }
