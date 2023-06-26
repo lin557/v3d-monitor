@@ -9,6 +9,7 @@
         :border="item.border"
         :index="index"
         :lang="props.lang"
+        :forward="item.forward"
         :controls="props.lockControls"
         :screenshot="props.screenshot"
         :fullscreen="props.fullscreen"
@@ -23,6 +24,7 @@
         @drop="doDrop($event, index)"
         @dragover="doDragOver($event)"
         @dragstart="doDragStart($event, index)"
+        @forward="doForward($event, index)"
       >
         <template v-slot:ready>
           <template v-if="slots.ready">
@@ -160,7 +162,13 @@ const refView = ref()
 type Player = typeof V3dPlayer
 let refPlayers: Array<Player> = []
 
-const emits = defineEmits(['timeout', 'loadeddata', 'refresh', 'position'])
+const emits = defineEmits([
+  'timeout',
+  'loadeddata',
+  'refresh',
+  'position',
+  'forward'
+])
 
 type MergeObject = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -231,6 +239,10 @@ const props = defineProps({
       return navigator.language.toLowerCase()
     }
   },
+  forward: {
+    type: Boolean,
+    default: false
+  },
   /**
    * 常驻工具栏
    */
@@ -268,6 +280,7 @@ interface VideoParam {
   cls: string
   border: boolean
   error: string
+  forward: boolean
   refresh: string
   title?: string
   detail?: string
@@ -545,6 +558,7 @@ const createView = () => {
         cls: calcCls(i),
         error: '',
         refresh: 'Refresh',
+        forward: props.forward,
         border: true,
         title: 'DIGITAL VIDEO',
         detail: '',
@@ -639,6 +653,11 @@ const doDragStart = (ev: DragEvent, index: number) => {
   } else {
     self.drag = -1
   }
+}
+
+const doForward = (rate: number, index: number) => {
+  const player = getPlayerById(index)
+  emits('forward', player, rate)
 }
 
 const updatePlayer = (index: number) => {
@@ -1050,6 +1069,15 @@ watch(
   }
 )
 
+watch(
+  () => props.forward,
+  () => {
+    for (let i = 0; i < self.videos.length; i++) {
+      self.videos[i].forward = props.forward
+    }
+  }
+)
+
 // watch(self, newValue => {
 //   if (newValue.viewCount === 1) {
 //     if (self.viewMax) {
@@ -1224,6 +1252,10 @@ $controlColor: #202020;
     height: calc(100% - #{$controlHeight});
     overflow: hidden;
     position: relative;
+
+    .v3d-player.v3d-focus {
+      border-color: rgba(183, 218, 255, 0.5) !important;
+    }
 
     .v3d-player {
       float: left;

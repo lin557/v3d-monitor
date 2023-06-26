@@ -9,6 +9,7 @@
       :timeout="3000"
       lang="en"
       :duplicate="false"
+      :forward="forward"
       :control-bar="controlBar"
       :close-time="closeTime"
       :fullscreen="fullscreen"
@@ -17,6 +18,7 @@
       @refresh="doRefresh"
       @loadeddata="doLoadedData"
       @position="doPosition"
+      @forward="doForward"
     >
       <!-- <template v-slot:ready>
         <div>abc</div>
@@ -81,6 +83,13 @@
         v-model="drag"
       />
       <label for="drag">Drag</label>
+      <input
+        style="width: 25px; min-width: 25px"
+        type="checkbox"
+        name="forward"
+        v-model="forward"
+      />
+      <label for="forward">forward</label>
     </div>
 
     <div class="demo-title">
@@ -230,10 +239,11 @@ const _bar = {
 const controlBar = reactive(_bar)
 
 const lockControls = ref('auto')
-const drag = ref(true)
+const drag = ref(false)
 
 const count = ref(9)
 const closeTime = ref(300000)
+const forward = ref(false)
 const screenshot = ref(true)
 const fullscreen = ref(true)
 
@@ -265,6 +275,10 @@ const doLoadedData = (player: Player) => {
 
 const doPosition = (player: Player, position: number) => {
   console.log('doPosition', player, position)
+}
+
+const doForward = (player: Player, rate: number) => {
+  console.log('doForward', rate)
 }
 
 const doTimeout = (player: Player) => {
@@ -333,7 +347,7 @@ const play = (index: number) => {
     {
       loadText: '蒙H12388D CH1 高清',
       title: '蒙H12388D CH1',
-      src: 'https://dno-xiu-hd.youku.com/lfgame/cmcu_alias_3597860654_8150038.flv?auth_key=1717121978-0-0-c86bc1d8c451422edfcb1776a5c33aab',
+      src: 'https://dno-xiu-hd.youku.com/lfgame/cmcu_alias_3582156836_8149409.flv?auth_key=1718239370-0-0-f25c8112eb0e0758193a9a82bda11f64',
       userData: {
         test1: '1',
         test2: '2'
